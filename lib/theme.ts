@@ -8,12 +8,21 @@ const MuiButton = {
   },
 };
 
+const MuiLink = {
+  styleOverrides: {
+    underlineAlways: {
+      textDecoration: "none",
+    },
+  },
+};
+
 const light = createTheme({
   palette: {
     mode: "light",
   },
   components: {
     MuiButton: MuiButton,
+    MuiLink: MuiLink,
   },
 });
 

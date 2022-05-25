@@ -6,7 +6,9 @@ const LoginPage = () => {
       className="w-screen h-screen flex items-center justify-center"
       data-testid="login-page"
     >
-      <LoginBox />
+      <div className="w-full max-w-md">
+        <LoginBox elevation={1} />
+      </div>
     </div>
   );
 };

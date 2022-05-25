@@ -9,6 +9,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectConfig } from "../lib/redux/slices/config";
 import { dark, light } from "../lib/theme";
+import AuthBoxPopup from "../components/layouts/AuthBoxPopup";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
         {/* component */}
         {getLayout(<Component {...pageProps} />)}
+        <AuthBoxPopup />
       </ThemeProvider>
     </QueryClientProvider>
   );

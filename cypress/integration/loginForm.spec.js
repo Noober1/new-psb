@@ -1,48 +1,98 @@
-describe("Login Page", () => {
-  beforeEach(() => {
-    // go to root page
-    cy.visit("/login");
-    // assert that the url is the about page
-    cy.url().should("include", "/login");
+describe("Login Box", () => {
+  it("Toggle login pop up", () => {
+    cy.visit("/");
+
+    // assert that the url visited is the correct one
+    cy.url().should("include", "/");
+
+    // click on login popup button
+    cy.findByTestId("login-box-toggle-button").click();
+
+    // login box should be visible
+    cy.findByTestId("login-box").should("be.visible");
+
+    // click on login popup button inside login box
+    cy.findByTestId("login-box")
+      .findByTestId("login-box-toggle-button")
+      .click();
+
+    // login box should be hidden
+    cy.findByTestId("login-box").should("not.exist");
   });
 
-  it("Login Box test", () => {
+  it("Login box input validation", () => {
+    // visit page that contain login box component
+    cy.visit("/login");
+
+    // assert that the url visited is the correct one
+    cy.url().should("include", "/login");
+
     // login page element should be visible
     cy.get('[data-testid="login-page"]').should("be.visible");
 
-    //   typing email
-    let emailLoginInput = cy.get('[data-testid="email-login-input"]');
-    emailLoginInput.type("ccc");
-    cy.findByRole("textbox", {
-      name: /silahkan masukan email anda/i,
-    }).should("exist");
-    emailLoginInput.type("testcsadc");
-    cy.findByRole("textbox", {
-      name: /format email salah/i,
-    }).should("exist");
-    emailLoginInput.type("testcsadc@aaa.com");
-    cy.findByRole("textbox", {
-      name: /format email salah/i,
-    }).should("not.exist");
+    //   typing empty email
+    cy.findByTestId("login-box-email").get('[name="email"]').type("c").clear();
 
-    //   typing email
-    let passwordLoginInput = cy.get('[data-testid="password-login-input"]');
-    passwordLoginInput.type("");
+    // label should be exist
+    cy.findByTestId("login-box-email").findByRole("label").should("exist");
 
-    // get the div element that contains the text "About Page"
-    cy.get('[data-testid="submit-login-input"]').click();
+    // typing email with incorrect format
+    cy.findByTestId("login-box-email").get('[name="email"]').type("testcsadc");
+
+    // label should be exist
+    cy.findByTestId("login-box-email").findByRole("label").should("exist");
+
+    // typing email correcty
+    cy.findByTestId("login-box-email")
+      .get('[name="email"]')
+      .type("testcsadc@aaa.com");
+
+    // label should not be exist
+    cy.findByTestId("login-box-email").findByRole("label").should("not.exist");
+
+    // clearing password
+    cy.findByTestId("login-box-password")
+      .get('[name="password"]')
+      .type("test")
+      .clear();
+
+    // label error should be exist
+    cy.findByTestId("login-box-password").findByRole("label").should("exist");
+
+    // submit button should be disabled
+    cy.findByTestId("submit-login-input").should("be.disabled");
+
+    // typing password under 8 characters
+    cy.findByTestId("login-box-password")
+      .get('[name="password"]')
+      .type("test123");
+
+    // label error should be exist
+    cy.findByTestId("login-box-password").findByRole("label").should("exist");
+
+    // typing password over 50 characters
+    cy.findByTestId("login-box-password")
+      .get('[name="password"]')
+      .type("1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 s");
+
+    // label error should be exist
+    cy.findByTestId("login-box-password").findByRole("label").should("exist");
+
+    // typing password between 8 and 50 characters
+    cy.findByTestId("login-box-password")
+      .get('[name="password"]')
+      .clear()
+      .type("test1234");
+
+    // error label should not exist
+    cy.findByTestId("login-box-password")
+      .findByRole("label")
+      .should("not.exist");
+
+    // button should be enabled
+    cy.findByTestId("submit-login-input").should("be.enabled");
+
+    // submitting form
+    cy.findByTestId("submit-login-input").click();
   });
-  // it("Login Box validation test", () => {
-  //   // login page element should be visible
-  //   cy.get('[data-testid="login-page"]').should("be.visible");
-
-  //   //   typing email
-  //   cy.get('[data-testid="email-login-input"]').type("test@afcdasc");
-
-  //   //   typing email
-  //   cy.get('[data-testid="password-login-input"]').type("csdcsdc");
-
-  //   // // get the div element that contains the text "About Page"
-  //   // cy.get('[data-testid="submit-login-input"]').click();
-  // });
 });

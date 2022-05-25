@@ -16,11 +16,11 @@ const ToggleDarkModeButton = ({ buttonType }: ToggleDarkModeButtonProps) => {
     dispatch(changeTheme(theme === "light" ? "dark" : "light"));
 
   return buttonType == "icon" ? (
-    <IconButton onClick={toggleDarkMode}>
+    <IconButton onClick={toggleDarkMode} data-testid="dark-mode-toggle-button">
       {theme === "light" ? <DarkModeIcon /> : <LightModeIcon />}
     </IconButton>
   ) : (
-    <Button onClick={toggleDarkMode}>
+    <Button onClick={toggleDarkMode} data-testid="dark-mode-toggle-button">
       {theme === "light" ? "Dark" : "Light"}
     </Button>
   );
