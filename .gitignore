@@ -36,7 +36,6 @@ yarn-error.log*
 
 # cypress
 /cypress/fixtures
-/cypress/plugins
 /cypress/support
 /cypress/screenshots
 /cypress/videos

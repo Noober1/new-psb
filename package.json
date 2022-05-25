@@ -15,9 +15,11 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.1",
     "@reduxjs/toolkit": "^1.8.1",
     "@sentry/nextjs": "^6.19.7",
+    "formik": "^2.2.9",
     "next": "12.1.6",
     "next-redux-wrapper": "^7.0.5",
     "react": "18.1.0",
@@ -28,8 +30,11 @@
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
+    "@cypress/react": "^5.12.5",
+    "@cypress/webpack-dev-server": "^1.8.4",
+    "@testing-library/cypress": "^8.0.2",
     "@types/node": "17.0.35",
-    "@types/react": "18.0.9",
+    "@types/react": "^18.0.9",
     "@types/react-dom": "18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
@@ -39,8 +44,11 @@
     "eslint": ">=5.16.0",
     "eslint-config-next": "12.1.6",
     "eslint-plugin-react": "^7.30.0",
+    "html-webpack-plugin": "^5.5.0",
     "postcss": "^8.4.14",
-    "tailwindcss": "^3.0.24",
-    "typescript": "4.6.4"
+    "tailwindcss": "2.2.17",
+    "typescript": "4.6.4",
+    "webpack": "^5.72.1",
+    "webpack-dev-server": "^4.9.0"
   }
 }

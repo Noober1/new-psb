@@ -5,7 +5,7 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { ReactElement, ReactNode } from "react";
 import wrapper from "../lib/redux";
-import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectConfig } from "../lib/redux/slices/config";
 import { dark, light } from "../lib/theme";
