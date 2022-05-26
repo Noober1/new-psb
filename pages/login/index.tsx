@@ -1,3 +1,5 @@
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
 import LoginBox from "../../components/organisms/LoginBox";
 
 const LoginPage = () => {
@@ -11,6 +13,23 @@ const LoginPage = () => {
       </div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const checkSession = await getSession(context);
+
+  if (checkSession) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
 };
 
 export default LoginPage;

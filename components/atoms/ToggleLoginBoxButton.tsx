@@ -7,12 +7,14 @@ import CloseIcon from "@mui/icons-material/Close";
 
 export type ToggleLoginBoxButtonProps = {
   buttonType?: "button" | "icon";
+  buttonLabel?: string;
   closeIcon?: boolean;
 };
 
 const ToggleLoginBoxButton = ({
   buttonType,
   closeIcon,
+  buttonLabel,
 }: ToggleLoginBoxButtonProps) => {
   const dispatch = useDispatch();
 
@@ -24,7 +26,7 @@ const ToggleLoginBoxButton = ({
       data-type="button"
       onClick={handleToggleOpenLoginBox}
     >
-      Login
+      {buttonLabel}
     </Button>
   ) : (
     <IconButton
@@ -39,6 +41,7 @@ const ToggleLoginBoxButton = ({
 
 ToggleLoginBoxButton.defaultProps = {
   buttonType: "button",
+  buttonLabel: "Login",
   closeIcon: false,
 };
 

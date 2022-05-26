@@ -1,19 +1,25 @@
-import { Button } from "@mui/material";
-import Link from "next/link";
-import { ReactElement } from "react";
-import ToggleDarkModeButton from "../components/atoms/ToggleDarkModeButton";
-import ToggleLoginBoxButton from "../components/atoms/ToggleLoginBoxButton";
+import { useSession } from "next-auth/react";
+import Head from "next/head";
+import { ReactElement, useEffect } from "react";
 import MainLayout, { MainLayoutType } from "../components/layouts/Main";
+import Hero from "../components/organisms/Hero";
 
 const Home: MainLayoutType = () => {
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    console.log(session);
+  }, [session]);
+
   return (
-    <div className="grid grid-cols-4">
-      <h1>Hello world!</h1>
-      <Link href="/about">About</Link>
-      <Link href="/login">Login</Link>
-      <ToggleDarkModeButton />
-      <ToggleLoginBoxButton buttonType="icon" />
-    </div>
+    <>
+      <Head>
+        <title>Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak</title>
+      </Head>
+      <div className="grid-grid-cols-1 bg-red-400">
+        <Hero />
+      </div>
+    </>
   );
 };
 

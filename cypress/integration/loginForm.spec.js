@@ -6,7 +6,7 @@ describe("Login Box", () => {
     cy.url().should("include", "/");
 
     // click on login popup button
-    cy.findByTestId("login-box-toggle-button").click();
+    cy.findByTestId("login-box-button-from-hero").click();
 
     // login box should be visible
     cy.findByTestId("login-box").should("be.visible");

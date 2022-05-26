@@ -4,16 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeTheme, selectConfig } from "../../lib/redux/slices/config";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import useToggleDarkMode from "../hooks/useToggleDarkMode";
 
 type ToggleDarkModeButtonProps = {
   buttonType: "icon" | "button";
 };
 
 const ToggleDarkModeButton = ({ buttonType }: ToggleDarkModeButtonProps) => {
-  const { theme } = useSelector(selectConfig);
-  const dispatch = useDispatch();
-  const toggleDarkMode = () =>
-    dispatch(changeTheme(theme === "light" ? "dark" : "light"));
+  const [theme, toggleDarkMode] = useToggleDarkMode();
 
   return buttonType == "icon" ? (
     <IconButton onClick={toggleDarkMode} data-testid="dark-mode-toggle-button">

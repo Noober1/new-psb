@@ -3,6 +3,7 @@ import { createTheme } from "@mui/material/styles";
 const MuiButton = {
   styleOverrides: {
     root: {
+      boxShadow: "none",
       fontWeight: "bold",
     },
   },
@@ -19,6 +20,12 @@ const MuiLink = {
 const light = createTheme({
   palette: {
     mode: "light",
+    primary: {
+      main: "#28166F",
+    },
+    secondary: {
+      main: "#FFF500",
+    },
   },
   components: {
     MuiButton: MuiButton,
@@ -29,9 +36,16 @@ const light = createTheme({
 const dark = createTheme({
   palette: {
     mode: "dark",
+    primary: {
+      main: "#3d20b2",
+    },
+    secondary: {
+      main: "#FFF500",
+    },
   },
   components: {
     MuiButton: MuiButton,
+    MuiLink: MuiLink,
   },
 });
 
