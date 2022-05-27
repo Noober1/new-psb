@@ -10,6 +10,7 @@ import ChangeAuthMenuButton from "../atoms/ChangeAuthMenuButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ToggleLoginBoxButton from "../atoms/ToggleLoginBoxButton";
 import { Formik } from "formik";
+import { runDevOnly } from "../../lib";
 
 type ForgotPasswordForm = {
   email: string;
@@ -28,7 +29,9 @@ const handleValidateForm = ({ email }: ForgotPasswordForm) => {
 };
 
 const handleSubmitForm = (values: ForgotPasswordForm, action: any) => {
-  console.log("submit form");
+  runDevOnly(() => {
+    console.log("submit form");
+  });
   action.setSubmitting(false);
 };
 

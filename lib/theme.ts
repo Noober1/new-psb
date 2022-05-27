@@ -17,6 +17,29 @@ const MuiLink = {
   },
 };
 
+const MuiTypography = {
+  styleOverrides: {
+    h1: {
+      fontFamily: "Inter",
+    },
+    h2: {
+      fontFamily: "Inter",
+    },
+    h3: {
+      fontFamily: "Inter",
+    },
+    h4: {
+      fontFamily: "Inter",
+    },
+    h5: {
+      fontFamily: "Inter",
+    },
+    h6: {
+      fontFamily: "Inter",
+    },
+  },
+};
+
 const light = createTheme({
   palette: {
     mode: "light",
@@ -30,6 +53,7 @@ const light = createTheme({
   components: {
     MuiButton: MuiButton,
     MuiLink: MuiLink,
+    MuiTypography: MuiTypography,
   },
 });
 
@@ -46,6 +70,7 @@ const dark = createTheme({
   components: {
     MuiButton: MuiButton,
     MuiLink: MuiLink,
+    MuiTypography: MuiTypography,
   },
 });
 

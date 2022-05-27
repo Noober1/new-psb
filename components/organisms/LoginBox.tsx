@@ -57,7 +57,6 @@ const LoginBox = ({
       redirect: false,
       username: values.email,
       password: values.password,
-      callbackUrl: `${window.location.origin}`,
     });
 
     runDevOnly(() => {

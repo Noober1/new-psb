@@ -13,6 +13,7 @@ import { dark, light } from "../lib/theme";
 import AuthBoxPopup from "../components/layouts/AuthBoxPopup";
 import { selectNoPersistConfig } from "../lib/redux/slices/noPersistConfig";
 import useSnackbar from "../components/hooks/useSnackbar";
+import UserDataProvider from "../components/atoms/UserDataProvider";
 
 const queryClient = new QueryClient();
 
@@ -35,26 +36,33 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
     <SessionProvider session={pageProps.session} refetchInterval={10}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={config.theme == "light" ? light : dark}>
-          {/* MUI CSS Baseline */}
-          <CssBaseline />
-          {/* react query devtool */}
-          <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-          {/* component */}
-          {getLayout(<Component {...pageProps} />)}
-          <AuthBoxPopup />
-          <Snackbar
-            autoHideDuration={5000}
-            open={snackbar.open}
-            onClose={closeSnackbar}
-            anchorOrigin={{
-              horizontal: snackbar.positionX,
-              vertical: snackbar.positionY,
-            }}
-          >
-            <Alert severity={snackbar.severity} variant="filled">
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
+          <UserDataProvider>
+            <>
+              {/* MUI CSS Baseline */}
+              <CssBaseline />
+              {/* react query devtool */}
+              <ReactQueryDevtools
+                initialIsOpen={false}
+                position="bottom-right"
+              />
+              {/* component */}
+              {getLayout(<Component {...pageProps} />)}
+              <AuthBoxPopup />
+              <Snackbar
+                autoHideDuration={5000}
+                open={snackbar.open}
+                onClose={closeSnackbar}
+                anchorOrigin={{
+                  horizontal: snackbar.positionX,
+                  vertical: snackbar.positionY,
+                }}
+              >
+                <Alert severity={snackbar.severity} variant="filled">
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
+            </>
+          </UserDataProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </SessionProvider>

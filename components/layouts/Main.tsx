@@ -5,11 +5,11 @@ import { ReactElement } from "react";
 import MainNavbar from "../organisms/MainNavbar";
 
 const MainLayout = ({ children }: { children: ReactElement }) => {
-  useEffect(() => {
-    runDevOnly(() => {
+  runDevOnly(() => {
+    useEffect(() => {
       console.log("Rendering MainLayout");
-    });
-  }, []);
+    }, []);
+  });
 
   return (
     <>

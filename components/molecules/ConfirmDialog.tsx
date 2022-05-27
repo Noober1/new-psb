@@ -39,6 +39,7 @@ const ConfirmDialogComponent: React.ForwardRefRenderFunction<
 
   const handleConfirm = (event: MouseEvent<HTMLElement>) => {
     if (typeof onConfirm !== "undefined") onConfirm(event);
+    setOpen(false);
   };
   useImperativeHandle(ref, () => ({
     openConfirm: () => setOpen(true),

@@ -1,3 +1,5 @@
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { getSession } from "next-auth/react";
 import React, { ReactElement } from "react";
 import { useQuery } from "react-query";
 import MainLayout, { MainLayoutType } from "../components/layouts/Main";
@@ -18,6 +20,16 @@ const About: MainLayoutType = () => {
       <div>{isLoading ? "Loading..." : data.login}</div>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  return {
+    props: {
+      session: await getSession(context),
+    },
+  };
 };
 
 About.getLayout = (page: ReactElement) => <MainLayout>{page}</MainLayout>;

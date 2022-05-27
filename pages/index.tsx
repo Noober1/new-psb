@@ -9,30 +9,30 @@ import Hero from "../components/organisms/Hero";
 import { runDevOnly } from "../lib";
 
 const Home: MainLayoutType = () => {
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
 
-  const fetchUserData = ({ signal }: QueryFunctionContext) =>
-    axios.get(process.env.NEXT_PUBLIC_API_URL + "/v1/ppdb/profile", {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+  // const fetchUserData = ({ signal }: QueryFunctionContext) =>
+  //   axios.get(process.env.NEXT_PUBLIC_API_URL + "/v1/ppdb/profile", {
+  //     headers: { Authorization: `Bearer ${session.accessToken}` },
+  //   });
 
-  const { isLoading, data, isError, isFetching, isIdle, isSuccess } = useQuery(
-    "user-data",
-    fetchUserData,
-    {
-      enabled: session?.accessToken ? true : false,
-      refetchInterval: 5000,
-    }
-  );
+  // const { isLoading, data, isError, isFetching, isIdle, isSuccess } = useQuery(
+  //   "user-data",
+  //   fetchUserData,
+  //   {
+  //     enabled: session?.accessToken ? true : false,
+  //     refetchInterval: 5000,
+  //   }
+  // );
 
-  runDevOnly(() => {
-    useEffect(() => {
-      console.log("session", session);
-    }, [session]);
-    // useEffect(() => {
-    //   console.log("isIdle", isIdle);
-    // }, [isIdle]);
-  });
+  // runDevOnly(() => {
+  //   useEffect(() => {
+  //     console.log("session", session);
+  //   }, [session]);
+  // useEffect(() => {
+  //   console.log("isIdle", isIdle);
+  // }, [isIdle]);
+  // });
 
   return (
     <>

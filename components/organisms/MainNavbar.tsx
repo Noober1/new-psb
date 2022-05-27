@@ -13,7 +13,7 @@ import {
   Paper,
   ClickAwayListener,
 } from "@mui/material";
-import { useState, MouseEvent, useRef } from "react";
+import { useState, MouseEvent, useRef, useEffect } from "react";
 import Logo from "../atoms/Logo";
 import LoginIcon from "@mui/icons-material/Login";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -28,20 +28,23 @@ import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import ConfirmDialog, { ConfirmDialogRef } from "../molecules/ConfirmDialog";
 import { runDevOnly } from "../../lib";
+import useUserData from "../hooks/useUserData";
 
 const MainNavbar = () => {
   const confirmLogoutDialogRef = useRef<ConfirmDialogRef>(null);
   const [openProfileMenu, setopenProfileMenu] = useState(false);
-  const { data: session } = useSession();
+
+  const [userData, userStatus] = useUserData();
+  const isAuthenticated = userStatus === "authenticated";
   const router = useRouter();
-  const handleOpenProfileMenu = (event: MouseEvent<HTMLButtonElement>) => {
-    runDevOnly(() => console.log("Main Navbar Profile menu open"));
-    setopenProfileMenu(!openProfileMenu);
+  const handleOpenProfileMenu = () => {
+    setopenProfileMenu(true);
   };
 
   const handleCloseProfileMenu = () => {
-    runDevOnly(() => console.log("Main Navbar Profile menu close"));
-    setopenProfileMenu(false);
+    if (openProfileMenu) {
+      setopenProfileMenu(false);
+    }
   };
 
   const [theme, toggleDarkMode] = useToggleDarkMode();
@@ -65,6 +68,7 @@ const MainNavbar = () => {
       });
 
       if (signinOut) {
+        router.push("/");
       }
     } catch (error) {}
   };
@@ -97,13 +101,18 @@ const MainNavbar = () => {
             <ClickAwayListener onClickAway={handleCloseProfileMenu}>
               <div>
                 <IconButton onClick={handleOpenProfileMenu}>
-                  <Avatar>
-                    {/* {session?.isLoggedIn && session?.user?.name?.charAt(0)} */}
+                  <Avatar
+                    sx={{
+                      backgroundColor: (theme) => theme.palette.secondary.main,
+                      color: (theme) => theme.palette.primary.main,
+                    }}
+                  >
+                    {isAuthenticated ? userData?.fullName?.charAt(0) : null}
                   </Avatar>
                 </IconButton>
                 {openProfileMenu && (
                   <Paper
-                    className="absolute w-72 top-20 text-left right-0"
+                    className="absolute w-72 top-20 text-left right-0 rounded-t-none"
                     elevation={10}
                   >
                     <MenuList>
@@ -124,10 +133,12 @@ const MainNavbar = () => {
                         </Typography>
                       </MenuItem>
                       <Divider />
-                      {session?.isLoggedIn ? (
+                      {isAuthenticated ? (
                         <div>
                           <MenuItem disabled>
-                            <Typography gutterBottom>Akun</Typography>
+                            <Typography gutterBottom>
+                              {userData?.fullNam}
+                            </Typography>
                           </MenuItem>
                           <MenuItem
                             onClick={() => router.push("/profile")}
@@ -172,7 +183,7 @@ const MainNavbar = () => {
                 )}
               </div>
             </ClickAwayListener>
-            {session?.isLoggedIn && (
+            {isAuthenticated && (
               <ConfirmDialog
                 ref={confirmLogoutDialogRef}
                 onConfirm={handleConfirmLogout}

@@ -16,9 +16,9 @@ const AuthBoxPopup = () => {
   const config = useSelector(selectNoPersistConfig);
   const dispatch = useDispatch();
   const [, , isSmall] = mediaQuery("xs");
-  const { data: session } = useSession();
+  const { status } = useSession();
 
-  if (session?.isLoggedIn) return null;
+  if (status == "authenticated") return null;
 
   const handleClickMenu = (data: AuthMenuType) => {
     dispatch(setAuthBoxMenuView(data));
