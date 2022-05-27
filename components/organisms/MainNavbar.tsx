@@ -73,8 +73,8 @@ const MainNavbar = () => {
     <AppBar position="fixed" color="primary" elevation={0}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
-          <div className="h-16 my-2 mr-3">
-            <Logo />
+          <div className="my-2 mr-3 relative">
+            <Logo className="h-16" />
           </div>
           <Typography variant="h6" className="mr-3">
             {process.env.NEXT_PUBLIC_COMPANY_NAME}
@@ -98,7 +98,7 @@ const MainNavbar = () => {
               <div>
                 <IconButton onClick={handleOpenProfileMenu}>
                   <Avatar>
-                    {session?.isLoggedIn && session?.user?.name?.charAt(0)}
+                    {/* {session?.isLoggedIn && session?.user?.name?.charAt(0)} */}
                   </Avatar>
                 </IconButton>
                 {openProfileMenu && (

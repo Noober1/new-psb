@@ -4,4 +4,16 @@
 
 .hero {
   background-image: url("/images/bg-header.jpg");
+  @apply w-full bg-cover bg-no-repeat bg-center relative;
+}
+
+.hero-image::before {
+  content: "";
+  background-image: url("/images/hero.png");
+  @apply absolute w-2/3 h-full bg-contain bg-no-repeat bg-left-bottom;
+}
+
+.hero-image::after {
+  content: "";
+  @apply inset-0 absolute;
 }

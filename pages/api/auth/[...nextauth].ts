@@ -1,4 +1,6 @@
+import axios from "axios";
 import NextAuth, { NextAuthOptions } from "next-auth";
+import fetchApi from "../../../lib/fetchApi";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const options: NextAuthOptions = {
@@ -15,43 +17,35 @@ const options: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const data = [
-          {
-            email: "cucu.ruhiyatna3@gmail.com",
-            password: "kekaishi123",
-            name: "Cucu Ruhiyatna",
-          },
-          { email: "cucu@ruhiyatna.id", password: "test", Name: "tesuto" },
-        ];
+        try {
+          const getData: any = await fetchApi({
+            method: "POST",
+            url: "/v1/ppdb/login",
+            data: {
+              username: credentials?.username,
+              password: credentials?.password,
+            },
+          });
 
-        const findData = data.find(
-          (item) =>
-            credentials?.username == item.email &&
-            credentials.password == item.password
-        );
-
-        return findData
-          ? {
-              email: findData.email,
-              name: findData.name,
-            }
-          : null;
+          return {
+            accessToken: getData.accessToken,
+          };
+        } catch (error) {
+          console.log(error);
+          return null;
+        }
       },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account && user) {
-        return {
-          ...token,
-          accessToken: token.accessToken,
-        };
-      }
-      return token;
+    async jwt({ token, user }) {
+      return { ...token, ...user };
     },
     async session({ session, token, user }) {
+      const accessToken = token.accessToken as string;
       session.isLoggedIn = true;
+      session.accessToken = accessToken;
       return session;
     },
   },

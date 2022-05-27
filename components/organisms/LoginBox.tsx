@@ -1,11 +1,6 @@
 import {
   Alert,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Link,
   Paper,
@@ -110,7 +105,7 @@ const LoginBox = ({
           </div>
         )}
         <div className="h-28 text-center flex-1 flex items-center justify-center login-logo mt-2">
-          <Logo />
+          <Logo className="h-full" />
         </div>
         <Typography align="center" variant="h5" fontWeight="bold">
           Log in
