@@ -14,7 +14,7 @@ const MainLayout = ({ children }: { children: ReactElement }) => {
   return (
     <>
       <MainNavbar />
-      <main>{children}</main>
+      <main id="main-wrapper">{children}</main>
     </>
   );
 };
