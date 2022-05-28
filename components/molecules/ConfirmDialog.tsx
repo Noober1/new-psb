@@ -21,28 +21,51 @@ type ConfirmDialogProps = {
   confirmText?: string;
   onConfirm?: Function;
   onCancel?: Function;
+  autoCloseOnConfirm: boolean;
 };
 
 type ConfirmDialogHandle = {
   openConfirm: () => void;
+  closeConfirm: () => void;
 };
 
 const ConfirmDialogComponent: React.ForwardRefRenderFunction<
   ConfirmDialogHandle,
   ConfirmDialogProps
-> = ({ title, text, cancelText, confirmText, onCancel, onConfirm }, ref) => {
+> = (
+  {
+    title,
+    text,
+    cancelText,
+    confirmText,
+    onCancel,
+    onConfirm,
+    autoCloseOnConfirm = true,
+  },
+  ref
+) => {
   const [open, setOpen] = useState<boolean>(false);
   const handleCancel = (event: MouseEvent<HTMLElement>) => {
     if (typeof onCancel !== "undefined") onCancel(event);
     setOpen(false);
   };
 
-  const handleConfirm = (event: MouseEvent<HTMLElement>) => {
-    if (typeof onConfirm !== "undefined") onConfirm(event);
-    setOpen(false);
+  const handleConfirm = (
+    event: MouseEvent<HTMLElement>,
+    autoClose: boolean
+  ) => {
+    if (typeof onConfirm !== "undefined") {
+      onConfirm(event);
+      if (autoClose) {
+        setOpen(false);
+      }
+    } else {
+      setOpen(false);
+    }
   };
   useImperativeHandle(ref, () => ({
     openConfirm: () => setOpen(true),
+    closeConfirm: () => setOpen(false),
   }));
 
   return (
@@ -56,7 +79,11 @@ const ConfirmDialogComponent: React.ForwardRefRenderFunction<
           <Button onClick={handleCancel} variant="contained" disableElevation>
             {cancelText ?? "Tidak"}
           </Button>
-          <Button onClick={handleConfirm} variant="contained" disableElevation>
+          <Button
+            onClick={(event) => handleConfirm(event, autoCloseOnConfirm)}
+            variant="contained"
+            disableElevation
+          >
             {confirmText ?? "Ya"}
           </Button>
         </div>
