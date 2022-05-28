@@ -1,11 +1,40 @@
 import { createTheme } from "@mui/material/styles";
 
+interface ColorPalette {
+  primary: string;
+  secondary: string;
+}
+
+export type ThemeColorPalette = {
+  light: ColorPalette;
+  dark: ColorPalette;
+};
+
+const colorPalette: ThemeColorPalette = {
+  light: {
+    primary: "#28166F",
+    secondary: "#FFF500",
+  },
+  dark: {
+    primary: "#28166F",
+    secondary: "#FFF500",
+  },
+};
+
+const typography = {
+  fontFamily: "Inter",
+};
+
 const MuiButton = {
   styleOverrides: {
     root: {
-      boxShadow: "none",
+      fontFamily: "Inter",
       fontWeight: "bold",
+      boxShadow: "none",
     },
+  },
+  defaultProps: {
+    disableElevation: true,
   },
 };
 
@@ -17,61 +46,38 @@ const MuiLink = {
   },
 };
 
-const MuiTypography = {
-  styleOverrides: {
-    h1: {
-      fontFamily: "Inter",
-    },
-    h2: {
-      fontFamily: "Inter",
-    },
-    h3: {
-      fontFamily: "Inter",
-    },
-    h4: {
-      fontFamily: "Inter",
-    },
-    h5: {
-      fontFamily: "Inter",
-    },
-    h6: {
-      fontFamily: "Inter",
-    },
-  },
-};
-
 const light = createTheme({
+  typography,
   palette: {
     mode: "light",
     primary: {
-      main: "#28166F",
+      main: colorPalette.light.primary,
     },
     secondary: {
-      main: "#FFF500",
+      main: colorPalette.light.secondary,
     },
   },
   components: {
-    MuiButton: MuiButton,
-    MuiLink: MuiLink,
-    MuiTypography: MuiTypography,
+    MuiButton,
+    MuiLink,
   },
 });
 
 const dark = createTheme({
+  typography,
   palette: {
     mode: "dark",
     primary: {
-      main: "#3d20b2",
+      main: colorPalette.dark.primary,
     },
     secondary: {
-      main: "#FFF500",
+      main: colorPalette.dark.secondary,
     },
   },
   components: {
-    MuiButton: MuiButton,
-    MuiLink: MuiLink,
-    MuiTypography: MuiTypography,
+    MuiButton,
+    MuiLink,
   },
 });
 
-export { light, dark };
+export { light, dark, colorPalette };
