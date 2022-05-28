@@ -13,7 +13,7 @@ import {
   Paper,
   ClickAwayListener,
 } from "@mui/material";
-import { useState, MouseEvent, useRef, useEffect } from "react";
+import { useState, MouseEvent, useRef } from "react";
 import Logo from "../atoms/Logo";
 import LoginIcon from "@mui/icons-material/Login";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -25,14 +25,16 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import Link from "../atoms/Link";
 import MuiLink from "@mui/material/Link";
 import { useRouter } from "next/router";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import ConfirmDialog, { ConfirmDialogRef } from "../molecules/ConfirmDialog";
-import { runDevOnly } from "../../lib";
 import useUserData from "../hooks/useUserData";
+import { useDispatch } from "react-redux";
+import { openSnackbar } from "../../lib/redux/slices/noPersistConfig";
 
 const MainNavbar = () => {
   const confirmLogoutDialogRef = useRef<ConfirmDialogRef>(null);
   const [openProfileMenu, setopenProfileMenu] = useState(false);
+  const dispatch = useDispatch();
 
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
@@ -61,16 +63,28 @@ const MainNavbar = () => {
   };
 
   const handleConfirmLogout = async () => {
-    // TODO: should be fixed
     try {
-      const signinOut = await signOut({
+      const executeSignOut = await signOut({
         redirect: false,
       });
 
-      if (signinOut) {
-        router.push("/");
+      if (executeSignOut) {
+        handleCloseProfileMenu();
+        dispatch(
+          openSnackbar({
+            message: "Berhasil keluar",
+            severity: "success",
+          })
+        );
       }
-    } catch (error) {}
+    } catch (error) {
+      dispatch(
+        openSnackbar({
+          message: "Gagal keluar",
+          severity: "error",
+        })
+      );
+    }
   };
 
   return (
@@ -84,17 +98,33 @@ const MainNavbar = () => {
             {process.env.NEXT_PUBLIC_COMPANY_NAME}
           </Typography>
           <div className="flex-1 sm:flex md:hidden">Icon Button</div>
-          <div className="flex-1 flex items-center justify-end mx-10 gap-10">
-            <MuiLink component={Link} color="inherit" href="/" variant="h6">
+          <div className="flex-1 flex items-center justify-end mx-10 gap-6">
+            <MuiLink
+              component={Link}
+              color="inherit"
+              href="/"
+              variant="subtitle1"
+              fontWeight="bold"
+            >
               Home
             </MuiLink>
             <MuiLink
               component={Link}
               href="/about"
               color="inherit"
-              variant="h6"
+              variant="subtitle1"
+              fontWeight="bold"
             >
               Tentang
+            </MuiLink>
+            <MuiLink
+              component={Link}
+              color="inherit"
+              href="/test"
+              variant="subtitle1"
+              fontWeight="bold"
+            >
+              Test
             </MuiLink>
           </div>
           <div className="text-right">
@@ -106,8 +136,12 @@ const MainNavbar = () => {
                       backgroundColor: (theme) => theme.palette.secondary.main,
                       color: (theme) => theme.palette.primary.main,
                     }}
+                    className="font-bold"
                   >
-                    {isAuthenticated ? userData?.fullName?.charAt(0) : null}
+                    {isAuthenticated
+                      ? userData?.firstName?.charAt(0) +
+                        userData?.lastName?.charAt(0)
+                      : null}
                   </Avatar>
                 </IconButton>
                 {openProfileMenu && (
@@ -137,7 +171,7 @@ const MainNavbar = () => {
                         <div>
                           <MenuItem disabled>
                             <Typography gutterBottom>
-                              {userData?.fullNam}
+                              {userData?.fullName}
                             </Typography>
                           </MenuItem>
                           <MenuItem
@@ -181,14 +215,15 @@ const MainNavbar = () => {
                     </MenuList>
                   </Paper>
                 )}
+                {isAuthenticated && (
+                  <ConfirmDialog
+                    ref={confirmLogoutDialogRef}
+                    onConfirm={handleConfirmLogout}
+                    autoCloseOnConfirm={false}
+                  />
+                )}
               </div>
             </ClickAwayListener>
-            {isAuthenticated && (
-              <ConfirmDialog
-                ref={confirmLogoutDialogRef}
-                onConfirm={handleConfirmLogout}
-              />
-            )}
           </div>
         </Toolbar>
       </Container>
