@@ -2,6 +2,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import React from "react";
 import { QueryFunctionContext, useQuery } from "react-query";
+import LoadingScreen from "./LoadingScreen";
 
 type UserDataProvider = {
   children: React.ReactElement;
@@ -16,11 +17,12 @@ const UserDataProvider = ({ children }: UserDataProvider) => {
       signal,
     });
 
-  useQuery("user-data", fetchUserData, {
+  const { isLoading } = useQuery("user-data", fetchUserData, {
     enabled: status !== "loading" && status === "authenticated" ? true : false,
   });
 
-  if (status === "loading") return <div>test</div>;
+  // if session status is not loading or react query is not loading(querying successfully)
+  if (status === "loading" || isLoading) return <LoadingScreen />;
 
   return children;
 };
