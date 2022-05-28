@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Collapse,
   IconButton,
   Link,
   Paper,
@@ -21,6 +22,7 @@ import { toggleLoginBox } from "../../lib/redux/slices/noPersistConfig";
 import { runDevOnly } from "../../lib";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import { useRouter } from "next/router";
+import PaperWithLoadingOverlay from "../atoms/PaperWithLoadingOverlay";
 
 type LoginFormValues = {
   email?: string;
@@ -65,8 +67,10 @@ const LoginBox = ({
 
     if (result.ok) {
       if (popupMode) {
-        dispatch(toggleLoginBox());
-        actions.setSubmitting(false);
+        setTimeout(() => {
+          actions.setSubmitting(false);
+          dispatch(toggleLoginBox());
+        }, 5000);
       } else {
         router.push("/");
       }
@@ -79,7 +83,7 @@ const LoginBox = ({
       }
       setTimeout(() => {
         setErrorMessage("");
-      }, 3000);
+      }, 5000);
     }
   };
   const [showPassword, setshowPassword] = useState<boolean>(false);
@@ -92,52 +96,52 @@ const LoginBox = ({
   };
 
   return (
-    <Paper
-      className="w-full p-1 login-box relative"
-      data-testid="login-box"
-      elevation={elevation}
+    <Formik
+      initialValues={loginAuthFormValues}
+      validationSchema={Yup.object({
+        email: Yup.string()
+          .max(50, "Email tidak lebih dari 50 karakter")
+          .email("Format email salah")
+          .required("Silahkan masukan email anda"),
+        password: Yup.string()
+          .max(50, "Kata sandi maksimal 50 karakter")
+          .min(8, "Kata sandi minimal 8 karakter")
+          .required("Silahkan masukan kata sandi anda"),
+      })}
+      onSubmit={loginAuthSubmitHandler}
     >
-      <div className="grid grid-cols-1">
-        {showCloseButton && (
-          <div className="absolute right-2 top-2">
-            <ToggleLoginBoxButton buttonType="icon" closeIcon />
-          </div>
-        )}
-        <div className="h-28 text-center flex-1 flex items-center justify-center login-logo mt-2">
-          <Logo className="h-full" />
-        </div>
-        <Typography align="center" variant="h5" fontWeight="bold">
-          Log in
-        </Typography>
-        {errorMessage.length > 0 && (
-          <Alert severity="error" variant="filled" className="mx-3 mt-3">
-            {errorMessage}
-          </Alert>
-        )}
-        <div id="login-box-content" className="m-3">
-          <Formik
-            initialValues={loginAuthFormValues}
-            validationSchema={Yup.object({
-              email: Yup.string()
-                .max(50, "Email tidak lebih dari 50 karakter")
-                .email("Format email salah")
-                .required("Silahkan masukan email anda"),
-              password: Yup.string()
-                .max(50, "Kata sandi maksimal 50 karakter")
-                .min(8, "Kata sandi minimal 8 karakter")
-                .required("Silahkan masukan kata sandi anda"),
-            })}
-            onSubmit={loginAuthSubmitHandler}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting,
-            }) => (
+      {({
+        values,
+        errors,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isSubmitting,
+      }) => (
+        <PaperWithLoadingOverlay
+          className="w-full p-1 login-box relative"
+          data-testid="login-box"
+          elevation={elevation}
+          showOverlay={isSubmitting}
+        >
+          <div className="grid grid-cols-1">
+            {showCloseButton && (
+              <div className="absolute right-2 top-2">
+                <ToggleLoginBoxButton buttonType="icon" closeIcon />
+              </div>
+            )}
+            <div className="h-28 text-center flex-1 flex items-center justify-center login-logo mt-2">
+              <Logo className="h-full" />
+            </div>
+            <Typography align="center" variant="h5" fontWeight="bold">
+              Log in
+            </Typography>
+            <Collapse in={errorMessage.length > 0} orientation="vertical">
+              <Alert severity="error" variant="filled" className="mx-3 mt-3">
+                {errorMessage}
+              </Alert>
+            </Collapse>
+            <div id="login-box-content" className="m-3">
               <form
                 onSubmit={handleSubmit}
                 data-testid="login-box-form"
@@ -178,7 +182,7 @@ const LoginBox = ({
                     disabled={isSubmitting}
                     required
                   />
-                  <IconButton className="m-1" onClick={toggleShowPassword}>
+                  <IconButton className="m-1 ml-3" onClick={toggleShowPassword}>
                     {showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </div>
@@ -200,36 +204,36 @@ const LoginBox = ({
                   {isSubmitting ? "Memproses" : "Login Akun"}
                 </Button>
               </form>
-            )}
-          </Formik>
-          <div className="grid grid-cols-2 mt-3">
-            <span>
-              <Link
-                href="/forgot-password"
-                onClick={(event) => handleAuthMenuLink(event, "forgot")}
-                tabIndex={0}
-                fontWeight="bold"
-                className="cursor-pointer"
-                data-testid="login-box-forget-pass-link"
-              >
-                Lupa kata sandi?
-              </Link>
-            </span>
-            <span className="text-right">
-              <Link
-                href="/register"
-                tabIndex={0}
-                fontWeight="bold"
-                className="cursor-pointer"
-                data-testid="login-box-register-link"
-              >
-                Daftar sekarang
-              </Link>
-            </span>
+              <div className="grid grid-cols-2 mt-3">
+                <span>
+                  <Link
+                    href="/forgot-password"
+                    onClick={(event) => handleAuthMenuLink(event, "forgot")}
+                    tabIndex={0}
+                    fontWeight="bold"
+                    className="cursor-pointer"
+                    data-testid="login-box-forget-pass-link"
+                  >
+                    Lupa kata sandi?
+                  </Link>
+                </span>
+                <span className="text-right">
+                  <Link
+                    href="/register"
+                    tabIndex={0}
+                    fontWeight="bold"
+                    className="cursor-pointer"
+                    data-testid="login-box-register-link"
+                  >
+                    Daftar sekarang
+                  </Link>
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </Paper>
+        </PaperWithLoadingOverlay>
+      )}
+    </Formik>
   );
 };
 
