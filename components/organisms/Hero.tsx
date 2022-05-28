@@ -1,20 +1,14 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Typography, Link as MuiLink } from "@mui/material";
 import { alpha, Box } from "@mui/system";
+import { FunctionComponent } from "react";
 import Link from "../atoms/Link";
 import useToggleOpenLoginBox from "../hooks/useToggleLoginPopup";
+import useUserData from "../hooks/useUserData";
 
-type UserData = {
-  name: string;
-};
-
-type HeroProps = {
-  userData: UserData;
-};
-
-const Hero = ({ userData }: HeroProps) => {
-  const openLoginBox = useToggleOpenLoginBox();
-  const hasUserData = Object.keys(userData).length > 0;
-
+const Hero: FunctionComponent = () => {
+  const toggleLoginBox = useToggleOpenLoginBox();
+  const [userData, userStatus] = useUserData();
+  const isAuthenticated = userStatus === "authenticated";
   return (
     <Box
       className="hero hero-image"
@@ -28,26 +22,52 @@ const Hero = ({ userData }: HeroProps) => {
     >
       <Box
         className="grid grid-cols-2 h-screen"
-        sx={(theme) => ({
+        sx={() => ({
           minHeight: 400,
         })}
       >
         <div></div>
         <div className="flex h-full flex-col justify-center pr-10 z-10">
-          <div>
-            <Typography variant="h1" className="text-white">
-              disini entahlah
-            </Typography>
-          </div>
-          <div className="flex gap-2 my-5 opacity-90">
+          {(!isAuthenticated || !userData) && (
+            <div>
+              <Typography variant="h2" component="h1" fontWeight="bold">
+                Selamat datang di
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                Pendaftaran Siswa Baru
+              </Typography>
+            </div>
+          )}
+          {isAuthenticated && userData && (
+            <div>
+              <Typography variant="h5" fontWeight="bold">
+                Selamat datang,
+              </Typography>
+              <Typography
+                variant="h3"
+                fontWeight="bold"
+                textTransform="uppercase"
+                noWrap
+              >
+                {userData?.fullName}
+              </Typography>
+              <Typography fontWeight={600}>
+                Kunjungi halaman{" "}
+                <Link underline="always" href="/guide">
+                  Panduan
+                </Link>{" "}
+                untuk melihat panduan lengkap.
+              </Typography>
+            </div>
+          )}
+          <div className="flex gap-2 my-5 opacity-95">
             <Button LinkComponent={Link} href="/guide" variant="contained">
               Panduan
             </Button>
-            <Button>BUtton list</Button>
-            {/* {!session?.isLoggedIn ? (
+            {!isAuthenticated ? (
               <>
                 <Button
-                  onClick={openLoginBox}
+                  onClick={() => toggleLoginBox()}
                   variant="contained"
                   data-testid="login-box-button-from-hero"
                 >
@@ -65,7 +85,7 @@ const Hero = ({ userData }: HeroProps) => {
               <Button LinkComponent={Link} href="/profile" variant="contained">
                 Profile
               </Button>
-            )} */}
+            )}
           </div>
         </div>
       </Box>
