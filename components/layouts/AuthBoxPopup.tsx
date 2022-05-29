@@ -13,12 +13,13 @@ import LoginBox from "../organisms/LoginBox";
 export type AuthMenuType = "login" | "forgot" | "register";
 
 const AuthBoxPopup = () => {
+  const { data: session } = useSession();
   const config = useSelector(selectNoPersistConfig);
   const dispatch = useDispatch();
   const [, , isSmall] = mediaQuery("xs");
   const { status } = useSession();
 
-  if (status == "authenticated") return null;
+  if (status == "authenticated" || session) return null;
 
   const handleClickMenu = (data: AuthMenuType) => {
     dispatch(setAuthBoxMenuView(data));

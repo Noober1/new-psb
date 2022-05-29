@@ -1,5 +1,7 @@
+import { Typography } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
+import ToggleDarkModeButton from "../../components/atoms/ToggleDarkModeButton";
 import LoginBox from "../../components/organisms/LoginBox";
 
 const LoginPage = () => {
@@ -10,7 +12,18 @@ const LoginPage = () => {
       data-testid="login-page"
     >
       <div className="w-full max-w-md">
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          textAlign="center"
+          gutterBottom
+        >
+          Pendaftaran Siswa Baru
+        </Typography>
         {!session && <LoginBox elevation={1} />}
+        <div className="text-center w-full my-5">
+          <ToggleDarkModeButton buttonType="button" />
+        </div>
       </div>
     </div>
   );

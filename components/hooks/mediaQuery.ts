@@ -4,6 +4,8 @@ import React from "react";
 
 export type MediaQuerySize = "xs" | "sm" | "md" | "lg" | "xl";
 
+type MediaQuery = [boolean, boolean, boolean];
+
 const mediaQuery = (size: MediaQuerySize) => {
   const theme = useTheme();
   const up = useMediaQuery(theme.breakpoints.up(size));

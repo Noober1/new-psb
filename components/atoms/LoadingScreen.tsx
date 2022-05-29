@@ -1,14 +1,42 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
+import { alpha } from "@mui/system";
+import clsx from "clsx";
 import LoadingLogo from "./LoadingLogo";
+import { FunctionComponent } from "react";
 
-const LoadingScreen = () => {
+interface LoadingScreen {
+  backgroundOpacity?: number;
+  position?: "initial" | "fixed";
+  text?: string;
+}
+
+const LoadingScreen: FunctionComponent<LoadingScreen> = ({
+  backgroundOpacity,
+  position,
+  text,
+}) => {
   return (
-    <Paper className="rounded-none">
-      <Box className="w-screen h-screen flex items-center justify-center overflow-hidden">
-        <LoadingLogo progress={0} />
-      </Box>
-    </Paper>
+    <Box
+      className={clsx(
+        position == "fixed" && "fixed inset-0 z-10",
+        "w-screen h-screen flex items-center flex-col justify-center overflow-hidden m-0 p-0"
+      )}
+      bgcolor={(theme) =>
+        alpha(theme.palette.background.paper, backgroundOpacity || 1)
+      }
+    >
+      <LoadingLogo progress={0} enableDarkModeToggle />
+      <Typography className="mt-5" variant="h4" textTransform="capitalize">
+        {text}
+      </Typography>
+    </Box>
   );
+};
+
+LoadingScreen.defaultProps = {
+  backgroundOpacity: 1,
+  position: "initial",
+  text: "",
 };
 
 export default LoadingScreen;

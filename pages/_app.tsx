@@ -15,6 +15,9 @@ import { selectNoPersistConfig } from "../lib/redux/slices/noPersistConfig";
 import useSnackbar from "../components/hooks/useSnackbar";
 import UserDataProvider from "../components/atoms/UserDataProvider";
 import NextNProgress from "nextjs-progressbar";
+import LoadingScreen from "../components/atoms/LoadingScreen";
+import useLoadingScreen from "../components/hooks/useLoadingScreen";
+import PageLoading from "../components/organisms/PageLoading";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +32,8 @@ type AppPropsWithLayout = AppProps & {
 const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
   const config = useSelector(selectConfig);
-  const { snackbar } = useSelector(selectNoPersistConfig);
+  const { snackbar, loadingScreenText } = useSelector(selectNoPersistConfig);
+  const [isLoading, showLoadingScreen] = useLoadingScreen();
   const [, closeSnackbar] = useSnackbar({});
   const isDarkMode = config.theme == "light";
 
@@ -71,6 +75,7 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
                   {snackbar.message}
                 </Alert>
               </Snackbar>
+              <PageLoading />
             </>
           </UserDataProvider>
         </ThemeProvider>

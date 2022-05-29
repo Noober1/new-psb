@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import useToggleDarkMode from "../hooks/useToggleDarkMode";
 import Logo from "./Logo";
 
-const LoadingLogo = ({ progress: progressValue }: { progress?: number }) => {
+const LoadingLogo = ({
+  progress: progressValue,
+  enableDarkModeToggle = false,
+}: {
+  progress?: number;
+  enableDarkModeToggle?: boolean;
+}) => {
   const [progress, setProgress] = useState<number>(10);
   const [themeType, handleToggleDarkMode] = useToggleDarkMode();
   const isDarkMode = themeType === "dark";
@@ -29,13 +35,19 @@ const LoadingLogo = ({ progress: progressValue }: { progress?: number }) => {
     }
   }, [progressValue]);
 
+  const handleClickLogo = () => {
+    if (enableDarkModeToggle) {
+      handleToggleDarkMode();
+    }
+  };
+
   return (
     <Box className="relative">
       <Fab
         size="large"
         className="shadow-none"
         color="primary"
-        onClick={handleToggleDarkMode}
+        onClick={handleClickLogo}
       >
         <Logo className="h-10 -mt-1" />
       </Fab>

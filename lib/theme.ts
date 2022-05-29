@@ -10,13 +10,23 @@ export type ThemeColorPalette = {
   dark: ColorPalette;
 };
 
+const breakpoints = {
+  values: {
+    xs: 320,
+    sm: 640,
+    md: 768,
+    lg: 1024,
+    xl: 1280,
+  },
+};
+
 const colorPalette: ThemeColorPalette = {
   light: {
     primary: "#28166F",
     secondary: "#FFF500",
   },
   dark: {
-    primary: "#28166F",
+    primary: "#36459b",
     secondary: "#FFF500",
   },
 };
@@ -39,15 +49,22 @@ const MuiButton = {
 };
 
 const MuiLink = {
-  styleOverrides: {
-    underlineAlways: {
-      textDecoration: "none",
+  defaultProps: {
+    underline: "none" as "none",
+  },
+};
+
+const MuiTextField = {
+  defaultProps: {
+    InputLabelProps: {
+      shrink: true,
     },
   },
 };
 
 const light = createTheme({
   typography,
+  breakpoints,
   palette: {
     mode: "light",
     primary: {
@@ -60,11 +77,13 @@ const light = createTheme({
   components: {
     MuiButton,
     MuiLink,
+    MuiTextField,
   },
 });
 
 const dark = createTheme({
   typography,
+  breakpoints,
   palette: {
     mode: "dark",
     primary: {
@@ -77,6 +96,7 @@ const dark = createTheme({
   components: {
     MuiButton,
     MuiLink,
+    MuiTextField,
   },
 });
 

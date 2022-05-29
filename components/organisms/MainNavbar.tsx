@@ -12,12 +12,15 @@ import {
   MenuList,
   Paper,
   ClickAwayListener,
+  Collapse,
 } from "@mui/material";
 import { useState, MouseEvent, useRef } from "react";
 import Logo from "../atoms/Logo";
 import LoginIcon from "@mui/icons-material/Login";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import MenuIcon from "@mui/icons-material/Menu";
+import NavbarMenuBulletIcon from "@mui/icons-material/DoubleArrow";
 import RegistrationIcon from "@mui/icons-material/AppRegistration";
 import useToggleDarkMode from "../hooks/useToggleDarkMode";
 import useToggleOpenLoginBox from "../hooks/useToggleLoginPopup";
@@ -30,17 +33,38 @@ import ConfirmDialog, { ConfirmDialogRef } from "../molecules/ConfirmDialog";
 import useUserData from "../hooks/useUserData";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../../lib/redux/slices/noPersistConfig";
+import { runDevOnly } from "../../lib";
+import mediaQuery from "../hooks/mediaQuery";
+import ProfileIcon from "../atoms/ProfileIcon";
+
+interface NavbarMenuList {
+  text: string;
+  link: string;
+}
+
+const navbarMenuList: NavbarMenuList[] = [
+  { link: "/", text: "Home" },
+  { link: "/guide", text: "Panduan" },
+  { link: "/about", text: "Tentang" },
+];
+
+runDevOnly(() => {
+  navbarMenuList.push({ link: "/test", text: "Test" });
+});
 
 const MainNavbar = () => {
   const confirmLogoutDialogRef = useRef<ConfirmDialogRef>(null);
-  const [openProfileMenu, setopenProfileMenu] = useState(false);
+  const [openProfileMenu, setopenProfileMenu] = useState<boolean>(false);
+  const [openNavbarMenu, setOpenNavbarMenu] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
   const router = useRouter();
-  const handleOpenProfileMenu = () => {
-    setopenProfileMenu(true);
+  const [hideNavbarMenuByScreen] = mediaQuery("md");
+
+  const handleToggleProfileMenu = () => {
+    setopenProfileMenu((prevState) => !prevState);
   };
 
   const handleCloseProfileMenu = () => {
@@ -48,6 +72,10 @@ const MainNavbar = () => {
       setopenProfileMenu(false);
     }
   };
+
+  const handleToggleNavbarMenu = () =>
+    setOpenNavbarMenu((prevMenu) => !prevMenu);
+  const handleCloseNavbarMenu = () => setOpenNavbarMenu(false);
 
   const [theme, toggleDarkMode] = useToggleDarkMode();
   const toggleLoginBox = useToggleOpenLoginBox();
@@ -89,61 +117,79 @@ const MainNavbar = () => {
 
   return (
     <AppBar position="fixed" color="primary" elevation={0}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl" className="px-2 md:px-5">
         <Toolbar disableGutters>
-          <div className="my-2 mr-3 relative">
+          <ClickAwayListener onClickAway={handleCloseNavbarMenu}>
+            <div className="md:hidden">
+              <IconButton
+                color="inherit"
+                onClick={handleToggleNavbarMenu}
+                size="large"
+              >
+                <MenuIcon />
+              </IconButton>
+              <div className="absolute top-20 mt-2 w-full">
+                {openNavbarMenu && (
+                  <Paper elevation={0} className="">
+                    <MenuList>
+                      {navbarMenuList.map((item, index) => (
+                        <MenuItem
+                          key={item.link}
+                          divider={index + 1 < navbarMenuList.length}
+                        >
+                          <ListItemIcon>
+                            <NavbarMenuBulletIcon />
+                          </ListItemIcon>
+                          <Link
+                            color="inherit"
+                            href={item.link}
+                            variant="h5"
+                            onClick={handleCloseNavbarMenu}
+                          >
+                            {item.text}
+                          </Link>
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Paper>
+                )}
+              </div>
+            </div>
+          </ClickAwayListener>
+          <div className="my-2 flex flex-1 md:flex-none md:table justify-center mr-3 relative">
             <Logo className="h-16" />
           </div>
-          <Typography variant="h6" className="mr-3">
-            {process.env.NEXT_PUBLIC_COMPANY_NAME}
-          </Typography>
-          <div className="flex-1 sm:flex md:hidden">Icon Button</div>
-          <div className="flex-1 flex items-center justify-end mx-10 gap-6">
-            <MuiLink
-              component={Link}
-              color="inherit"
-              href="/"
-              variant="subtitle1"
-              fontWeight="bold"
-            >
-              Home
-            </MuiLink>
-            <MuiLink
-              component={Link}
-              href="/about"
-              color="inherit"
-              variant="subtitle1"
-              fontWeight="bold"
-            >
-              Tentang
-            </MuiLink>
-            <MuiLink
-              component={Link}
-              color="inherit"
-              href="/test"
-              variant="subtitle1"
-              fontWeight="bold"
-            >
-              Test
-            </MuiLink>
+          <div className="hidden md:inline flex-1">
+            <Typography variant="h6">
+              {process.env.NEXT_PUBLIC_COMPANY_NAME}
+            </Typography>
+          </div>
+          <div className="flex-1 hidden md:flex items-center justify-end mx-10 gap-6">
+            {navbarMenuList.map((item) => (
+              <MuiLink
+                key={item.link}
+                component={Link}
+                color="inherit"
+                href={item.link}
+                variant="subtitle1"
+                fontWeight="bold"
+              >
+                {item.text}
+              </MuiLink>
+            ))}
           </div>
           <div className="text-right">
             <ClickAwayListener onClickAway={handleCloseProfileMenu}>
               <div>
-                <IconButton onClick={handleOpenProfileMenu}>
-                  <Avatar
-                    sx={{
-                      backgroundColor: (theme) => theme.palette.secondary.main,
-                      color: (theme) => theme.palette.primary.main,
-                    }}
-                    className="font-bold"
-                  >
-                    {isAuthenticated
-                      ? userData?.firstName?.charAt(0) +
-                        userData?.lastName?.charAt(0)
-                      : null}
-                  </Avatar>
-                </IconButton>
+                <ProfileIcon
+                  onClick={handleToggleProfileMenu}
+                  showBorder={openProfileMenu}
+                >
+                  {isAuthenticated
+                    ? userData?.firstName?.charAt(0) +
+                      userData?.lastName?.charAt(0)
+                    : null}
+                </ProfileIcon>
                 {openProfileMenu && (
                   <Paper
                     className="absolute w-72 top-20 text-left right-0 rounded-t-none"

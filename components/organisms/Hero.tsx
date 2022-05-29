@@ -26,20 +26,20 @@ const Hero: FunctionComponent = () => {
           minHeight: 400,
         })}
       >
-        <div></div>
-        <div className="flex h-full flex-col justify-center pr-10 z-10">
+        <div className="col-span-2 lg:col-span-1 hidden lg:flex"></div>
+        <div className="col-span-2 text-center lg:text-left lg:col-span-1 flex h-full flex-col justify-center lg:pr-10 z-10">
           {(!isAuthenticated || !userData) && (
-            <div>
+            <>
               <Typography variant="h2" component="h1" fontWeight="bold">
                 Selamat datang di
               </Typography>
               <Typography variant="h4" fontWeight="bold">
                 Pendaftaran Siswa Baru
               </Typography>
-            </div>
+            </>
           )}
           {isAuthenticated && userData && (
-            <div>
+            <>
               <Typography variant="h5" fontWeight="bold">
                 Selamat datang,
               </Typography>
@@ -51,16 +51,21 @@ const Hero: FunctionComponent = () => {
               >
                 {userData?.fullName}
               </Typography>
-              <Typography fontWeight={600}>
+              <Typography>
                 Kunjungi halaman{" "}
-                <Link underline="always" href="/guide">
+                <Link
+                  underline="always"
+                  href="/guide"
+                  color="inherit"
+                  fontWeight="bold"
+                >
                   Panduan
                 </Link>{" "}
                 untuk melihat panduan lengkap.
               </Typography>
-            </div>
+            </>
           )}
-          <div className="flex gap-2 my-5 opacity-95">
+          <div className="justify-center lg:justify-start flex gap-2 my-5 opacity-95">
             <Button LinkComponent={Link} href="/guide" variant="contained">
               Panduan
             </Button>
@@ -78,7 +83,7 @@ const Hero: FunctionComponent = () => {
                   href="/register"
                   variant="contained"
                 >
-                  Daftar sekarang
+                  Daftar
                 </Button>
               </>
             ) : (

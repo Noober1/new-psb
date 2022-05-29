@@ -51,6 +51,10 @@ const options: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    signOut: "/logout",
+    error: "/error",
+    newUser: "/signup",
+    verifyRequest: "/verify-request",
   },
 };
 

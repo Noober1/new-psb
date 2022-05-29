@@ -16,7 +16,7 @@ import Logo from "../atoms/Logo";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
 import * as Yup from "yup";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { toggleLoginBox } from "../../lib/redux/slices/noPersistConfig";
 import { runDevOnly } from "../../lib";
@@ -46,15 +46,18 @@ const LoginBox = ({
   popupMode,
   linkMenuCallback,
 }: LoginBoxProps) => {
+  const { status } = useSession();
   const router = useRouter();
   const dispatch = useDispatch();
   const [openLoginErrorDialog, setopenLoginErrorDialog] =
     useState<boolean>(false);
+  const [lockLoginBox, setlockLoginBox] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const loginAuthSubmitHandler = async (
     values: LoginFormValues,
     actions: any
   ) => {
+    setlockLoginBox(true);
     const result: any = await signIn("credentials", {
       redirect: false,
       username: values.email,
@@ -66,15 +69,12 @@ const LoginBox = ({
     });
 
     if (result.ok) {
-      if (popupMode) {
-        setTimeout(() => {
-          actions.setSubmitting(false);
-          dispatch(toggleLoginBox());
-        }, 5000);
-      } else {
-        router.push("/");
-      }
+      setTimeout(() => {
+        actions.setSubmitting(false);
+        dispatch(toggleLoginBox());
+      }, 5000);
     } else {
+      setlockLoginBox(false);
       setopenLoginErrorDialog(true);
       if (result.status === 401) {
         setErrorMessage("Email atau kata sandi salah");
@@ -122,7 +122,7 @@ const LoginBox = ({
           className="w-full p-1 login-box relative"
           data-testid="login-box"
           elevation={elevation}
-          showOverlay={isSubmitting}
+          showOverlay={isSubmitting || lockLoginBox}
         >
           <div className="grid grid-cols-1">
             {showCloseButton && (
