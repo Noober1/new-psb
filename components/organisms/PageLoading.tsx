@@ -17,6 +17,9 @@ const PageLoading = () => {
         className="mt-5 cursor-default"
         variant="h5"
         textTransform="capitalize"
+        sx={{
+          color: (theme) => theme.palette.primary.contrastText,
+        }}
       >
         {text}
       </Typography>

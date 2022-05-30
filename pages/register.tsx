@@ -16,16 +16,28 @@ import { Formik, FormikComputedProps, FormikProps, FormikState } from "formik";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { ReactElement, ReactNode, useEffect } from "react";
+import React, {
+  ReactElement,
+  ReactNode,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import * as Yup from "yup";
 import LoadingScreen from "../components/atoms/LoadingScreen";
 import PaperWithLoadingOverlay from "../components/atoms/PaperWithLoadingOverlay";
 import mediaQuery from "../components/hooks/mediaQuery";
-import useToggleOpenLoginBox from "../components/hooks/useToggleLoginPopup";
+import useLoginPopup from "../components/hooks/useLoginPopup";
 import useUserData from "../components/hooks/useUserData";
 import MainLayout, { MainLayoutType } from "../components/layouts/Main";
 import useLoadingScreen from "../components/hooks/useLoadingScreen";
 import ServerSideSelect from "../components/organisms/ServerSideSelect";
+import DatePicker from "../components/organisms/DatePicker";
+import {
+  GoogleReCaptcha,
+  GoogleReCaptchaProvider,
+} from "react-google-recaptcha-v3";
 
 export interface RegisterFormValues {
   firstName: string;
@@ -40,6 +52,7 @@ export interface RegisterFormValues {
   graduateYear: number;
   email: string;
   selectedMajor: string;
+  captchaToken: string;
 }
 
 const registerFormInitialValues: RegisterFormValues = {
@@ -54,7 +67,8 @@ const registerFormInitialValues: RegisterFormValues = {
   lastSchool: "",
   phone: "",
   selectedMajor: "",
-  sex: "P",
+  sex: "L",
+  captchaToken: "",
 };
 
 const graduateYearMin = 1990;
@@ -68,6 +82,7 @@ const formSchema = Yup.object().shape({
   lastName: Yup.string().max(45, "Panjang maksimal 45 karakter"),
   middleName: Yup.string().max(10, "Panjang maksimal 10 karakter"),
   nisn: Yup.string()
+    .min(8, "Panjang digit minimal 8 digit")
     .max(10, "Panjang maksimal 10 karakter")
     .required("NISN wajib diisi"),
   birthDate: Yup.date().required("Tanggal lahir waji diisi"),
@@ -75,14 +90,15 @@ const formSchema = Yup.object().shape({
     .max(15, "Panjang maksimal 15 karakter")
     .required("Tempat lahir wajib diisi"),
   email: Yup.string()
-    .email("Invalid email address")
+    .email("Format alamat surel(email) tidak valid")
     .max(50, "Panjang maksimal 50 karakter")
-    .required("Email is required"),
+    .required("Email wajib diisi"),
   graduateYear: Yup.number()
     .min(graduateYearMin)
     .max(currentYear)
-    .required("Graduate year is required"),
-  lastEducation: Yup.string().required("Last education is required"),
+    .required("Tahun lulus wajib diisi"),
+  lastEducation: Yup.string().required("Pendidikan terakhir wajib diisi"),
+  lastSchool: Yup.string().required("Asal sekolah wajib diisi"),
   phone: Yup.string()
     .matches(/^[0-9]*$/, "Nomor telpon invalid")
     .max(15, "Panjang maksimal 15 digit angka tanpa simbol ataupun huruf")
@@ -96,12 +112,6 @@ const fakeFetch = () =>
       resolve("OK");
     }, 5000);
   });
-const handleSubmitForm = async (values: RegisterFormValues, actions: any) => {
-  const data = await fakeFetch();
-  if (data) {
-    actions.setSubmitting(false);
-  }
-};
 
 const Form = ({
   values,
@@ -124,6 +134,9 @@ const Form = ({
 
   return (
     <form className="grid grid-cols-4 gap-3 gap-y-5" onSubmit={handleSubmit}>
+      <GoogleReCaptcha
+        onVerify={(token) => setFieldValue("captchaToken", token)}
+      />
       <TextField
         className="col-span-4 sm:col-span-2"
         error={isError("firstName")}
@@ -133,7 +146,6 @@ const Form = ({
         onBlur={handleBlur}
         value={values.firstName}
         onChange={handleChange}
-        required
       />
       <TextField
         className="col-span-4 sm:col-span-2"
@@ -154,7 +166,6 @@ const Form = ({
         onBlur={handleBlur}
         value={values.phone}
         onChange={handleChange}
-        required
       />
       <TextField
         className="col-span-4 sm:col-span-2"
@@ -165,7 +176,6 @@ const Form = ({
         onBlur={handleBlur}
         value={values.email}
         onChange={handleChange}
-        required
       />
       <TextField
         className="col-span-4 sm:col-span-2"
@@ -176,19 +186,15 @@ const Form = ({
         onBlur={handleBlur}
         value={values.birthPlace}
         onChange={handleChange}
-        required
       />
-      <TextField
-        className="col-span-4 sm:col-span-2"
-        error={isError("birthDate")}
-        label="Tanggal lahir"
-        name="birthDate"
-        helperText={helperText("birthDate")}
-        onBlur={handleBlur}
-        value={values.birthDate}
-        onChange={handleChange}
-        required
-      />
+      <div className="col-span-4 sm:col-span-2">
+        <DatePicker
+          error={isError("birthDate")}
+          helperText={helperText("birthDate")}
+          label="Tanggal lahir"
+          onChange={(value) => setFieldValue("birthDate", value)}
+        />
+      </div>
       <FormControl className="col-span-4 md:col-span-2">
         <InputLabel>Jenis kelamin</InputLabel>
         <Select
@@ -212,7 +218,6 @@ const Form = ({
         onBlur={handleBlur}
         value={values.nisn}
         onChange={handleChange}
-        required
       />
       <FormControl className="col-span-4 lg:col-span-2">
         <InputLabel>Pendidikan Terakhir</InputLabel>
@@ -231,9 +236,9 @@ const Form = ({
       <div className="col-span-4 md:col-span-2">
         <ServerSideSelect
           error={isError("lastSchool")}
+          helperText={helperText("lastSchool")}
           onBlur={handleBlur}
           label="Asal sekolah"
-          helperText="Pilih lainnya jika tidak ada di daftar"
           placeholder="Silahkan pilih"
           valueSelector="id"
           labelSelector="text"
@@ -271,6 +276,7 @@ const Form = ({
       <div className="col-span-4 md:col-span-2">
         <ServerSideSelect
           error={isError("selectedMajor")}
+          helperText={helperText("selectedMajor")}
           onBlur={handleBlur}
           label="Jurusan yang dipilih"
           placeholder="Silahkan pilih"
@@ -289,7 +295,7 @@ const Form = ({
           type="submit"
           variant="contained"
           size="large"
-          disabled={isSubmitting || Object.keys(errors).length > 0}
+          disabled={isSubmitting}
         >
           {isSubmitting ? "Memproses" : "Registrasi"}
         </Button>
@@ -301,12 +307,13 @@ const Form = ({
 const RegisterPage: MainLayoutType = () => {
   const router = useRouter();
   const [, underSmScreen] = mediaQuery("md");
-  const handleOpenLogin = useToggleOpenLoginBox();
+  const [handleOpenLogin] = useLoginPopup();
   const [, userStatus] = useUserData();
   const isAuthenticated = userStatus == "authenticated";
   const [, openLoadingScreen, hideLoadingScreen] = useLoadingScreen();
 
   const handleSubmitForm = async (values: RegisterFormValues, actions: any) => {
+    console.log(values);
     openLoadingScreen("Memproses");
     const data = await fakeFetch();
     if (data) {
@@ -324,31 +331,36 @@ const RegisterPage: MainLayoutType = () => {
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
   return (
-    <Container className="my-24">
-      <Typography
-        variant="h2"
-        fontWeight="bold"
-        textAlign={underSmScreen ? "center" : "left"}
-      >
-        Pendaftaran
-      </Typography>
-      <Paper className="my-5 p-5">
-        <Typography className="mb-10">
-          Silahkan untuk mengisi form dibawah ini.
-          <br />
-          Sudah pernah mendaftar?{" "}
-          <Link onClick={handleOpenLogin} className="cursor-pointer">
-            Login disini
-          </Link>
+    <GoogleReCaptchaProvider
+      language="id"
+      reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+    >
+      <Container className="my-24">
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          textAlign={underSmScreen ? "center" : "left"}
+        >
+          Pendaftaran
         </Typography>
-        <Formik
-          children={Form}
-          initialValues={registerFormInitialValues}
-          onSubmit={handleSubmitForm}
-          validationSchema={formSchema}
-        />
-      </Paper>
-    </Container>
+        <Paper className="my-5 p-5">
+          <Typography className="mb-10">
+            Silahkan untuk mengisi form dibawah ini.
+            <br />
+            Sudah pernah mendaftar?{" "}
+            <Link onClick={handleOpenLogin} className="cursor-pointer">
+              Login disini
+            </Link>
+          </Typography>
+          <Formik
+            children={Form}
+            initialValues={registerFormInitialValues}
+            onSubmit={handleSubmitForm}
+            validationSchema={formSchema}
+          />
+        </Paper>
+      </Container>
+    </GoogleReCaptchaProvider>
   );
 };
 

@@ -2,11 +2,11 @@ import { Button, Typography, Link as MuiLink } from "@mui/material";
 import { alpha, Box } from "@mui/system";
 import { FunctionComponent } from "react";
 import Link from "../atoms/Link";
-import useToggleOpenLoginBox from "../hooks/useToggleLoginPopup";
+import useLoginPopup from "../hooks/useLoginPopup";
 import useUserData from "../hooks/useUserData";
 
 const Hero: FunctionComponent = () => {
-  const toggleLoginBox = useToggleOpenLoginBox();
+  const [toggleLoginBox] = useLoginPopup();
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
   return (
@@ -36,6 +36,18 @@ const Hero: FunctionComponent = () => {
               <Typography variant="h4" fontWeight="bold">
                 Pendaftaran Siswa Baru
               </Typography>
+              <Typography fontWeight={500}>
+                Kunjungi halaman{" "}
+                <Link
+                  underline="always"
+                  href="/guide"
+                  color="inherit"
+                  fontWeight="bold"
+                >
+                  Panduan
+                </Link>{" "}
+                untuk melihat panduan lengkap.
+              </Typography>
             </>
           )}
           {isAuthenticated && userData && (
@@ -51,17 +63,17 @@ const Hero: FunctionComponent = () => {
               >
                 {userData?.fullName}
               </Typography>
-              <Typography>
-                Kunjungi halaman{" "}
+              <Typography fontWeight={500}>
+                Silahkan untuk mengunjungi halaman{" "}
                 <Link
                   underline="always"
-                  href="/guide"
+                  href="/profile"
                   color="inherit"
                   fontWeight="bold"
                 >
-                  Panduan
+                  Profile
                 </Link>{" "}
-                untuk melihat panduan lengkap.
+                untuk melihat informasi pendaftaran anda.
               </Typography>
             </>
           )}

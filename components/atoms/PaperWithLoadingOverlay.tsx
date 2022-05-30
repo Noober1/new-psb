@@ -12,10 +12,11 @@ export type PaperWithLoadingOverlay = PaperProps & {
 const PaperWithLoadingOverlay: FunctionComponent<PaperWithLoadingOverlay> = ({
   children,
   className,
+  elevation,
   showOverlay = false,
 }) => {
   return (
-    <Paper className={clsx("relative", className)}>
+    <Paper className={clsx("relative", className)} elevation={elevation}>
       {children}
       <Fade in={showOverlay}>
         <Paper

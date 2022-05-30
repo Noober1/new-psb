@@ -25,7 +25,7 @@ const ProfileIcon: FunctionComponent<ProfileIcon> = ({
           {children}
         </Avatar>
         <CircularProgress
-          thickness={2}
+          thickness={2.5}
           color="secondary"
           className="absolute"
           variant="determinate"

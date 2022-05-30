@@ -6,7 +6,13 @@ import { QueryClientProvider, QueryClient } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { ReactElement, ReactNode } from "react";
 import wrapper from "../lib/redux";
-import { Alert, CssBaseline, Snackbar, ThemeProvider } from "@mui/material";
+import {
+  CssBaseline,
+  IconButton,
+  Snackbar,
+  ThemeProvider,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useSelector } from "react-redux";
 import { selectConfig } from "../lib/redux/slices/config";
 import { dark, light, colorPalette } from "../lib/theme";
@@ -15,7 +21,6 @@ import { selectNoPersistConfig } from "../lib/redux/slices/noPersistConfig";
 import useSnackbar from "../components/hooks/useSnackbar";
 import UserDataProvider from "../components/atoms/UserDataProvider";
 import NextNProgress from "nextjs-progressbar";
-import LoadingScreen from "../components/atoms/LoadingScreen";
 import useLoadingScreen from "../components/hooks/useLoadingScreen";
 import PageLoading from "../components/organisms/PageLoading";
 
@@ -34,47 +39,54 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
   const config = useSelector(selectConfig);
   const { snackbar, loadingScreenText } = useSelector(selectNoPersistConfig);
   const [isLoading, showLoadingScreen] = useLoadingScreen();
-  const [, closeSnackbar] = useSnackbar({});
+  const { handleCloseSnackbar } = useSnackbar();
   const isDarkMode = config.theme == "light";
 
   return (
-    // react query provider
+    // Next js session provider
     <SessionProvider session={pageProps.session} refetchInterval={10}>
+      {/* react query provider */}
       <QueryClientProvider client={queryClient}>
+        {/* MUI theme provider */}
         <ThemeProvider theme={isDarkMode ? light : dark}>
+          {/* User data provider */}
           <UserDataProvider>
             <>
+              {/* MUI CSS Baseline */}
+              <CssBaseline />
               {/* Progresbar */}
               <NextNProgress
                 color={colorPalette[isDarkMode ? "light" : "dark"].secondary}
               />
-              {/* MUI CSS Baseline */}
-              <CssBaseline />
               {/* react query devtool */}
               <ReactQueryDevtools
                 initialIsOpen={false}
-                position="bottom-right"
+                position="bottom-left"
               />
               {/* component */}
               {getLayout(<Component {...pageProps} />)}
+              {/* Login Popup */}
               <AuthBoxPopup />
+              {/* Main snackbar */}
               <Snackbar
-                autoHideDuration={5000}
-                open={snackbar.open}
-                onClose={closeSnackbar}
                 anchorOrigin={{
                   horizontal: snackbar.positionX,
                   vertical: snackbar.positionY,
                 }}
-              >
-                <Alert
-                  severity={snackbar.severity}
-                  variant="filled"
-                  onClose={closeSnackbar}
-                >
-                  {snackbar.message}
-                </Alert>
-              </Snackbar>
+                action={
+                  <IconButton
+                    onClick={(event) => handleCloseSnackbar()}
+                    color="primary"
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                }
+                open={snackbar.open}
+                autoHideDuration={5000}
+                onClose={() => handleCloseSnackbar()}
+                message={snackbar.message}
+              />
+              {/* page loading screen */}
               <PageLoading />
             </>
           </UserDataProvider>

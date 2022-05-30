@@ -3,7 +3,6 @@ import {
   Button,
   Collapse,
   IconButton,
-  Link,
   Paper,
   PaperProps,
   TextField,
@@ -18,11 +17,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import * as Yup from "yup";
 import { signIn, useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
-import { toggleLoginBox } from "../../lib/redux/slices/noPersistConfig";
+import { closeLoginPopup } from "../../lib/redux/slices/noPersistConfig";
 import { runDevOnly } from "../../lib";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
-import { useRouter } from "next/router";
 import PaperWithLoadingOverlay from "../atoms/PaperWithLoadingOverlay";
+import Link from "../atoms/Link";
+import useSnackbar from "../hooks/useSnackbar";
 
 type LoginFormValues = {
   email?: string;
@@ -37,18 +37,11 @@ const loginAuthFormValues: LoginFormValues = {
 export type LoginBoxProps = PaperProps & {
   showCloseButton?: boolean;
   popupMode?: boolean;
-  linkMenuCallback?: Function;
 };
 
-const LoginBox = ({
-  showCloseButton,
-  elevation,
-  popupMode,
-  linkMenuCallback,
-}: LoginBoxProps) => {
-  const { status } = useSession();
-  const router = useRouter();
+const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const dispatch = useDispatch();
+  const { handleOpenSnackbar: openSnackbar } = useSnackbar();
   const [openLoginErrorDialog, setopenLoginErrorDialog] =
     useState<boolean>(false);
   const [lockLoginBox, setlockLoginBox] = useState<boolean>(false);
@@ -69,10 +62,13 @@ const LoginBox = ({
     });
 
     if (result.ok) {
-      setTimeout(() => {
-        actions.setSubmitting(false);
-        dispatch(toggleLoginBox());
-      }, 5000);
+      actions.setSubmitting(false);
+      dispatch(closeLoginPopup());
+      openSnackbar({
+        positionX: "center",
+        message: "Berhasil login",
+        severity: "success",
+      });
     } else {
       setlockLoginBox(false);
       setopenLoginErrorDialog(true);
@@ -89,12 +85,6 @@ const LoginBox = ({
   const [showPassword, setshowPassword] = useState<boolean>(false);
   const toggleShowPassword = () => setshowPassword(!showPassword);
 
-  const handleAuthMenuLink = (event: MouseEvent<HTMLElement>, data: string) => {
-    if (!popupMode) return true;
-    event.preventDefault();
-    if (typeof linkMenuCallback !== "undefined") linkMenuCallback(data);
-  };
-
   return (
     <Formik
       initialValues={loginAuthFormValues}
@@ -104,9 +94,9 @@ const LoginBox = ({
           .email("Format email salah")
           .required("Silahkan masukan email anda"),
         password: Yup.string()
-          .max(50, "Kata sandi maksimal 50 karakter")
-          .min(8, "Kata sandi minimal 8 karakter")
-          .required("Silahkan masukan kata sandi anda"),
+          .max(15, "No. Telpon maksimal 15 karakter")
+          .min(8, "No. Telpon minimal 8 karakter")
+          .required("Silahkan masukan No. Telpon anda"),
       })}
       onSubmit={loginAuthSubmitHandler}
     >
@@ -121,7 +111,7 @@ const LoginBox = ({
         <PaperWithLoadingOverlay
           className="w-full p-1 login-box relative"
           data-testid="login-box"
-          elevation={elevation}
+          elevation={popupMode ? 0 : 4}
           showOverlay={isSubmitting || lockLoginBox}
         >
           <div className="grid grid-cols-1">
@@ -170,7 +160,7 @@ const LoginBox = ({
                     role="textbox"
                     data-testid="login-box-password"
                     name="password"
-                    placeholder="Kata sandi"
+                    placeholder="No. Telpon"
                     InputLabelProps={{
                       role: "label",
                     }}
@@ -204,30 +194,18 @@ const LoginBox = ({
                   {isSubmitting ? "Memproses" : "Login Akun"}
                 </Button>
               </form>
-              <div className="grid grid-cols-2 mt-3">
-                <span>
-                  <Link
-                    href="/forgot-password"
-                    onClick={(event) => handleAuthMenuLink(event, "forgot")}
-                    tabIndex={0}
-                    fontWeight="bold"
-                    className="cursor-pointer"
-                    data-testid="login-box-forget-pass-link"
-                  >
-                    Lupa kata sandi?
-                  </Link>
-                </span>
-                <span className="text-right">
-                  <Link
-                    href="/register"
-                    tabIndex={0}
-                    fontWeight="bold"
-                    className="cursor-pointer"
-                    data-testid="login-box-register-link"
-                  >
-                    Daftar sekarang
-                  </Link>
-                </span>
+              <div className="flex mt-3">
+                <Typography>Belum mendaftar?</Typography>
+                <Link
+                  href="/register"
+                  onClick={() => dispatch(closeLoginPopup())}
+                  tabIndex={0}
+                  fontWeight="bold"
+                  className="cursor-pointer ml-1"
+                  data-testid="login-box-register-link"
+                >
+                  Daftar sekarang
+                </Link>
               </div>
             </div>
           </div>
@@ -240,7 +218,6 @@ const LoginBox = ({
 LoginBox.defaultProps = {
   elevation: 0,
   popupMode: false,
-  linkMenuCallback: () => {},
 };
 
 export default LoginBox;

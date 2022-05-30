@@ -1,9 +1,14 @@
 import { Button, Dialog, IconButton } from "@mui/material";
 import LoginIcon from "@mui/icons-material/VpnKey";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { toggleLoginBox } from "../../lib/redux/slices/noPersistConfig";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  openLoginPopup,
+  closeLoginPopup,
+  selectNoPersistConfig,
+} from "../../lib/redux/slices/noPersistConfig";
 import CloseIcon from "@mui/icons-material/Close";
+import useLoginPopup from "../hooks/useLoginPopup";
 
 export type ToggleLoginBoxButtonProps = {
   buttonType?: "button" | "icon";
@@ -16,9 +21,16 @@ const ToggleLoginBoxButton = ({
   closeIcon,
   buttonLabel,
 }: ToggleLoginBoxButtonProps) => {
-  const dispatch = useDispatch();
+  const { config } = useSelector(selectNoPersistConfig);
+  const [handleOpen, handleClose] = useLoginPopup();
 
-  const handleToggleOpenLoginBox = () => dispatch(toggleLoginBox());
+  const handleToggleOpenLoginBox = () => {
+    if (config?.showAuthBox) {
+      handleOpen();
+    } else {
+      handleClose();
+    }
+  };
 
   return buttonType == "button" ? (
     <Button

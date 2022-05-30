@@ -23,7 +23,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NavbarMenuBulletIcon from "@mui/icons-material/DoubleArrow";
 import RegistrationIcon from "@mui/icons-material/AppRegistration";
 import useToggleDarkMode from "../hooks/useToggleDarkMode";
-import useToggleOpenLoginBox from "../hooks/useToggleLoginPopup";
+import useLoginPopup from "../hooks/useLoginPopup";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import Link from "../atoms/Link";
 import MuiLink from "@mui/material/Link";
@@ -78,16 +78,21 @@ const MainNavbar = () => {
   const handleCloseNavbarMenu = () => setOpenNavbarMenu(false);
 
   const [theme, toggleDarkMode] = useToggleDarkMode();
-  const toggleLoginBox = useToggleOpenLoginBox();
+  const [openLoginPopup, closeLoginPopup] = useLoginPopup();
 
-  const handleToggleLoginBox = (event: MouseEvent<HTMLElement>) => {
+  const handleOpenLoginPopup = (event: MouseEvent<HTMLElement>) => {
     handleCloseProfileMenu();
-    toggleLoginBox();
+    openLoginPopup();
   };
 
   const handleClickLogout = () => {
     if (confirmLogoutDialogRef.current?.openConfirm)
       confirmLogoutDialogRef.current?.openConfirm();
+  };
+
+  const handleOpenRegister = () => {
+    router.push("/register");
+    handleToggleProfileMenu();
   };
 
   const handleConfirmLogout = async () => {
@@ -98,6 +103,7 @@ const MainNavbar = () => {
 
       if (executeSignOut) {
         handleCloseProfileMenu();
+        closeLoginPopup();
         dispatch(
           openSnackbar({
             message: "Berhasil keluar",
@@ -241,16 +247,13 @@ const MainNavbar = () => {
                           <MenuItem disabled>
                             <Typography gutterBottom>Akun</Typography>
                           </MenuItem>
-                          <MenuItem onClick={handleToggleLoginBox} tabIndex={0}>
+                          <MenuItem onClick={handleOpenLoginPopup} tabIndex={0}>
                             <ListItemIcon>
                               <LoginIcon />
                             </ListItemIcon>
                             <ListItemText>Masuk</ListItemText>
                           </MenuItem>
-                          <MenuItem
-                            onClick={() => router.push("/register")}
-                            tabIndex={0}
-                          >
+                          <MenuItem onClick={handleOpenRegister} tabIndex={0}>
                             <ListItemIcon>
                               <RegistrationIcon />
                             </ListItemIcon>

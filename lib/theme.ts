@@ -67,6 +67,9 @@ const light = createTheme({
   breakpoints,
   palette: {
     mode: "light",
+    background: {
+      default: "#e5e5e5",
+    },
     primary: {
       main: colorPalette.light.primary,
     },

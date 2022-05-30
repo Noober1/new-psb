@@ -1,13 +1,9 @@
 import { Dialog } from "@mui/material";
 import { useSession } from "next-auth/react";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectNoPersistConfig,
-  setAuthBoxMenuView,
-} from "../../lib/redux/slices/noPersistConfig";
+import { selectNoPersistConfig } from "../../lib/redux/slices/noPersistConfig";
 import mediaQuery from "../hooks/mediaQuery";
-import ForgotPasswordBox from "../organisms/ForgotPasswordBox";
 import LoginBox from "../organisms/LoginBox";
 
 export type AuthMenuType = "login" | "forgot" | "register";
@@ -15,15 +11,10 @@ export type AuthMenuType = "login" | "forgot" | "register";
 const AuthBoxPopup = () => {
   const { data: session } = useSession();
   const config = useSelector(selectNoPersistConfig);
-  const dispatch = useDispatch();
   const [, , isSmall] = mediaQuery("xs");
   const { status } = useSession();
 
   if (status == "authenticated" || session) return null;
-
-  const handleClickMenu = (data: AuthMenuType) => {
-    dispatch(setAuthBoxMenuView(data));
-  };
 
   return (
     <Dialog
@@ -37,16 +28,7 @@ const AuthBoxPopup = () => {
       fullScreen={isSmall}
       maxWidth="xs"
     >
-      {config.authBoxMenuView === "login" ? (
-        <LoginBox
-          showCloseButton
-          popupMode
-          linkMenuCallback={handleClickMenu}
-          elevation={0}
-        />
-      ) : (
-        <ForgotPasswordBox />
-      )}
+      <LoginBox showCloseButton popupMode />
     </Dialog>
   );
 };

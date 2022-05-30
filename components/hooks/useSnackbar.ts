@@ -5,21 +5,21 @@ import {
 } from "../../lib/redux/slices/noPersistConfig";
 
 type useSnackbarProps = {
-  positionX?: "left" | "right";
+  positionX?: "left" | "right" | "center";
   positionY?: "top" | "bottom";
   message?: string;
   severity?: "success" | "info" | "warning" | "error";
 };
 
-const useSnackbar = (props: useSnackbarProps) => {
+const useSnackbar = () => {
   const dispatch = useDispatch();
-  const handleOpenSnackbar = () => {
+  const handleOpenSnackbar = (options: useSnackbarProps) => {
     dispatch(
       openSnackbar({
-        positionX: props.positionX,
-        positionY: props.positionY,
-        message: props.message,
-        severity: props.severity,
+        positionX: options.positionX,
+        positionY: options.positionY,
+        message: options.message,
+        severity: options.severity,
       })
     );
   };
@@ -28,14 +28,7 @@ const useSnackbar = (props: useSnackbarProps) => {
     dispatch(closeSnackbar());
   };
 
-  return [handleOpenSnackbar, handleCloseSnackbar];
-};
-
-useSnackbar.defaultProps = {
-  positionX: "left",
-  positionY: "bottom",
-  message: "No message",
-  severity: "info",
+  return { handleOpenSnackbar, handleCloseSnackbar };
 };
 
 export default useSnackbar;

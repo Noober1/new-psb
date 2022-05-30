@@ -1,4 +1,5 @@
 import { Button, Typography } from "@mui/material";
+import { GetServerSideProps } from "next";
 import { ReactElement, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import PaperWithLoadingOverlay from "../components/atoms/PaperWithLoadingOverlay";
@@ -14,6 +15,7 @@ const TestPage: MainLayoutType = () => {
   const handleOpenSnackbar = () => {
     dispatch(
       openSnackbar({
+        positionX: "center",
         message: "Hello World",
         severity: "success",
       })
@@ -54,6 +56,7 @@ const TestPage: MainLayoutType = () => {
       >
         T
       </ProfileIcon>
+      <Button onClick={handleOpenSnackbar}>Open snackbar</Button>
       <ServerSideSelect
         fullWidth
         placeholder="Silahkan pilih"
@@ -69,6 +72,19 @@ const TestPage: MainLayoutType = () => {
       </Button>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const production = process.env.NODE_ENV === "production";
+  if (production) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {},
+  };
 };
 
 TestPage.getLayout = (page: ReactElement) => <MainLayout>{page}</MainLayout>;
