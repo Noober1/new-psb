@@ -11,6 +11,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ToggleLoginBoxButton from "../atoms/ToggleLoginBoxButton";
 import { Formik } from "formik";
 import { runDevOnly } from "../../lib";
+import Logo from "../atoms/Logo";
 
 type ForgotPasswordForm = {
   email: string;
@@ -29,6 +30,7 @@ const handleValidateForm = ({ email }: ForgotPasswordForm) => {
 };
 
 const handleSubmitForm = (values: ForgotPasswordForm, action: any) => {
+  // TODO: unfinished
   runDevOnly(() => {
     console.log("submit form");
   });
@@ -55,7 +57,7 @@ const ForgotPassword = () => {
         </div>
       </div>
       <div className="h-28 text-center flex-1 flex items-center justify-center login-logo my-2">
-        <img src="/images/favicon.png" className="h-full" alt="Logo" />
+        <Logo className="h-20" />
       </div>
       <Typography variant="body1" align="center">
         Silahkan masukan email Anda untuk melanjutkan
