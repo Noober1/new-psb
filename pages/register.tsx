@@ -37,7 +37,9 @@ import DatePicker from "../components/organisms/DatePicker";
 import {
   GoogleReCaptcha,
   GoogleReCaptchaProvider,
+  useGoogleReCaptcha,
 } from "react-google-recaptcha-v3";
+import fetchApi from "../lib/fetchApi";
 
 export interface RegisterFormValues {
   firstName: string;
@@ -134,11 +136,8 @@ const Form = ({
 
   return (
     <form className="grid grid-cols-4 gap-3 gap-y-5" onSubmit={handleSubmit}>
-      <GoogleReCaptcha
-        onVerify={(token) => setFieldValue("captchaToken", token)}
-      />
       <TextField
-        className="col-span-4 sm:col-span-2"
+        className="col-span-4 sm:col-span-2 capitalize"
         error={isError("firstName")}
         label="Nama depan"
         name="firstName"
@@ -148,7 +147,7 @@ const Form = ({
         onChange={handleChange}
       />
       <TextField
-        className="col-span-4 sm:col-span-2"
+        className="col-span-4 sm:col-span-2 capitalize"
         error={isError("lastName")}
         label="Nama belakang"
         name="lastName"
@@ -158,7 +157,7 @@ const Form = ({
         onChange={handleChange}
       />
       <TextField
-        className="col-span-4 sm:col-span-2"
+        className="col-span-4 sm:col-span-2 capitalize"
         error={isError("phone")}
         label="Nomor Telpon/Handphone"
         name="phone"
@@ -178,7 +177,7 @@ const Form = ({
         onChange={handleChange}
       />
       <TextField
-        className="col-span-4 sm:col-span-2"
+        className="col-span-4 sm:col-span-2 capitalize"
         error={isError("birthPlace")}
         label="Tempat lahir"
         name="birthPlace"
@@ -306,6 +305,7 @@ const Form = ({
 
 const RegisterPage: MainLayoutType = () => {
   const router = useRouter();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [, underSmScreen] = mediaQuery("md");
   const [handleOpenLogin] = useLoginPopup();
   const [, userStatus] = useUserData();
@@ -313,13 +313,26 @@ const RegisterPage: MainLayoutType = () => {
   const [, openLoadingScreen, hideLoadingScreen] = useLoadingScreen();
 
   const handleSubmitForm = async (values: RegisterFormValues, actions: any) => {
-    console.log(values);
-    openLoadingScreen("Memproses");
-    const data = await fakeFetch();
-    if (data) {
-      actions.setSubmitting(false);
+    try {
+      openLoadingScreen("Memproses");
+      if (!executeRecaptcha) {
+        throw new Error("Google reCaptcha not ready yet");
+      }
+      const token = await executeRecaptcha("register");
+      if (!token) {
+        throw new Error("Get captcha token invalid");
+      }
+      values.captchaToken = token;
+      const data = await fetchApi({
+        method: "POST",
+        url: "/ppdb/register",
+        data: values,
+      });
+    } catch (error) {
+      console.log(error);
     }
     hideLoadingScreen();
+    actions.setSubmitting(false);
   };
 
   useEffect(() => {
@@ -331,41 +344,43 @@ const RegisterPage: MainLayoutType = () => {
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
   return (
-    <GoogleReCaptchaProvider
-      language="id"
-      reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
-    >
-      <Container className="my-24">
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          textAlign={underSmScreen ? "center" : "left"}
-        >
-          Pendaftaran
+    <Container className="my-24">
+      <Typography
+        variant="h3"
+        fontWeight="bold"
+        textAlign={underSmScreen ? "center" : "left"}
+      >
+        Pendaftaran
+      </Typography>
+      <Paper className="my-5 p-5">
+        <Typography className="mb-10">
+          Silahkan untuk mengisi form dibawah ini.
+          <br />
+          Sudah pernah mendaftar?{" "}
+          <Link onClick={handleOpenLogin} className="cursor-pointer">
+            Login disini
+          </Link>
         </Typography>
-        <Paper className="my-5 p-5">
-          <Typography className="mb-10">
-            Silahkan untuk mengisi form dibawah ini.
-            <br />
-            Sudah pernah mendaftar?{" "}
-            <Link onClick={handleOpenLogin} className="cursor-pointer">
-              Login disini
-            </Link>
-          </Typography>
-          <Formik
-            children={Form}
-            initialValues={registerFormInitialValues}
-            onSubmit={handleSubmitForm}
-            validationSchema={formSchema}
-          />
-        </Paper>
-      </Container>
-    </GoogleReCaptchaProvider>
+        <Formik
+          children={Form}
+          initialValues={registerFormInitialValues}
+          onSubmit={handleSubmitForm}
+          validationSchema={formSchema}
+        />
+      </Paper>
+    </Container>
   );
 };
 
 RegisterPage.getLayout = (page: ReactElement) => (
-  <MainLayout>{page}</MainLayout>
+  <MainLayout>
+    <GoogleReCaptchaProvider
+      language="id"
+      reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+    >
+      {page}
+    </GoogleReCaptchaProvider>
+  </MainLayout>
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

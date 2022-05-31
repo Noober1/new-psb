@@ -20,7 +20,7 @@ const options: NextAuthOptions = {
         try {
           const getData: any = await fetchApi({
             method: "POST",
-            url: "/v1/ppdb/login",
+            url: "/ppdb/login",
             data: {
               username: credentials?.username,
               password: credentials?.password,

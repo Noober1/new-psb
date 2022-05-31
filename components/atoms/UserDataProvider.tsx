@@ -12,7 +12,7 @@ const UserDataProvider = ({ children }: UserDataProvider) => {
   const { data: session, status } = useSession();
 
   const fetchUserData = ({ signal }: QueryFunctionContext) =>
-    axios.get(process.env.NEXT_PUBLIC_API_URL + "/v1/ppdb/profile", {
+    axios.get(process.env.NEXT_PUBLIC_API_URL + "/ppdb/profile", {
       headers: { Authorization: `Bearer ${session?.accessToken}` },
       signal,
     });
