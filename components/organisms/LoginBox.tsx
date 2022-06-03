@@ -23,15 +23,11 @@ import RotateRightIcon from "@mui/icons-material/RotateRight";
 import PaperWithLoadingOverlay from "../atoms/PaperWithLoadingOverlay";
 import Link from "../atoms/Link";
 import useSnackbar from "../hooks/useSnackbar";
+import { useRouter } from "next/router";
 
 type LoginFormValues = {
   email?: string;
   password?: string;
-};
-
-const loginAuthFormValues: LoginFormValues = {
-  email: "",
-  password: "",
 };
 
 export type LoginBoxProps = PaperProps & {
@@ -41,6 +37,11 @@ export type LoginBoxProps = PaperProps & {
 
 const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const loginAuthFormValues: LoginFormValues = {
+    email: (router.query?.email as string) || "",
+    password: (router.query?.phone as string) || "",
+  };
   const { handleOpenSnackbar: openSnackbar } = useSnackbar();
   const [openLoginErrorDialog, setopenLoginErrorDialog] =
     useState<boolean>(false);
@@ -64,6 +65,7 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
     if (result.ok) {
       actions.setSubmitting(false);
       dispatch(closeLoginPopup());
+      // TODO: mutate user data
       openSnackbar({
         positionX: "center",
         message: "Berhasil login",
@@ -126,6 +128,11 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
             <Typography align="center" variant="h5" fontWeight="bold">
               Log in
             </Typography>
+            {router.query.registerSuccess && (
+              <Alert severity="success" variant="filled" className="mx-3 mt-3">
+                Pendaftaran berhasil, silahkan untuk melakukan login
+              </Alert>
+            )}
             <Collapse in={errorMessage.length > 0} orientation="vertical">
               <Alert severity="error" variant="filled" className="mx-3 mt-3">
                 {errorMessage}

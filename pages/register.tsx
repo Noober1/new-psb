@@ -40,6 +40,8 @@ import {
   useGoogleReCaptcha,
 } from "react-google-recaptcha-v3";
 import fetchApi from "../lib/fetchApi";
+import axios, { AxiosError } from "axios";
+import useSnackbar from "../components/hooks/useSnackbar";
 
 export interface RegisterFormValues {
   firstName: string;
@@ -87,7 +89,7 @@ const formSchema = Yup.object().shape({
     .min(8, "Panjang digit minimal 8 digit")
     .max(10, "Panjang maksimal 10 karakter")
     .required("NISN wajib diisi"),
-  birthDate: Yup.date().required("Tanggal lahir waji diisi"),
+  birthDate: Yup.date().required("Tanggal lahir wajib diisi"),
   birthPlace: Yup.string()
     .max(15, "Panjang maksimal 15 karakter")
     .required("Tempat lahir wajib diisi"),
@@ -191,7 +193,7 @@ const Form = ({
           error={isError("birthDate")}
           helperText={helperText("birthDate")}
           label="Tanggal lahir"
-          onChange={(value) => setFieldValue("birthDate", value)}
+          onChange={(value) => setFieldValue("birthDate", value.toISOString())}
         />
       </div>
       <FormControl className="col-span-4 md:col-span-2">
@@ -306,6 +308,7 @@ const Form = ({
 const RegisterPage: MainLayoutType = () => {
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const { handleOpenSnackbar: openSnackbar } = useSnackbar();
   const [, underSmScreen] = mediaQuery("md");
   const [handleOpenLogin] = useLoginPopup();
   const [, userStatus] = useUserData();
@@ -316,20 +319,48 @@ const RegisterPage: MainLayoutType = () => {
     try {
       openLoadingScreen("Memproses");
       if (!executeRecaptcha) {
-        throw new Error("Google reCaptcha not ready yet");
+        throw new Error("Google reCaptcha is not ready yet");
       }
       const token = await executeRecaptcha("register");
       if (!token) {
         throw new Error("Get captcha token invalid");
       }
       values.captchaToken = token;
-      const data = await fetchApi({
+      const data: any = await fetchApi({
         method: "POST",
         url: "/ppdb/register",
         data: values,
       });
-    } catch (error) {
-      console.log(error);
+
+      if (data.success) {
+        router.push(
+          {
+            pathname: "/login",
+            query: {
+              registerSuccess: true,
+              email: values.email,
+              phone: values.phone,
+            },
+          },
+          "login"
+        );
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        let errorResponse = err.response?.data as {
+          message: string;
+          code: string;
+        };
+        openSnackbar({
+          message: errorResponse.message || "Terjadi kesalahan",
+          severity: "error",
+        });
+      } else {
+        openSnackbar({
+          message: "Terjadi kesalahan",
+          severity: "error",
+        });
+      }
     }
     hideLoadingScreen();
     actions.setSubmitting(false);

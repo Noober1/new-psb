@@ -37,8 +37,7 @@ type AppPropsWithLayout = AppProps & {
 const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
   const config = useSelector(selectConfig);
-  const { snackbar, loadingScreenText } = useSelector(selectNoPersistConfig);
-  const [isLoading, showLoadingScreen] = useLoadingScreen();
+  const { snackbar } = useSelector(selectNoPersistConfig);
   const { handleCloseSnackbar } = useSnackbar();
   const isDarkMode = config.theme == "light";
 
@@ -75,8 +74,8 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
                 }}
                 action={
                   <IconButton
-                    onClick={(event) => handleCloseSnackbar()}
-                    color="primary"
+                    onClick={() => handleCloseSnackbar()}
+                    color="secondary"
                   >
                     <CloseIcon />
                   </IconButton>
