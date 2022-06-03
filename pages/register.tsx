@@ -42,6 +42,7 @@ import {
 import fetchApi from "../lib/fetchApi";
 import axios, { AxiosError } from "axios";
 import useSnackbar from "../components/hooks/useSnackbar";
+import Head from "next/head";
 
 export interface RegisterFormValues {
   firstName: string;
@@ -375,31 +376,36 @@ const RegisterPage: MainLayoutType = () => {
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
   return (
-    <Container className="my-24">
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        textAlign={underSmScreen ? "center" : "left"}
-      >
-        Pendaftaran
-      </Typography>
-      <Paper className="my-5 p-5">
-        <Typography className="mb-10">
-          Silahkan untuk mengisi form dibawah ini.
-          <br />
-          Sudah pernah mendaftar?{" "}
-          <Link onClick={handleOpenLogin} className="cursor-pointer">
-            Login disini
-          </Link>
+    <>
+      <Head>
+        <title>Pendaftaran - SMK Bina Taruna Jalancagak</title>
+      </Head>
+      <Container className="my-24">
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          textAlign={underSmScreen ? "center" : "left"}
+        >
+          Pendaftaran
         </Typography>
-        <Formik
-          children={Form}
-          initialValues={registerFormInitialValues}
-          onSubmit={handleSubmitForm}
-          validationSchema={formSchema}
-        />
-      </Paper>
-    </Container>
+        <Paper className="my-5 p-5">
+          <Typography className="mb-10">
+            Silahkan untuk mengisi form dibawah ini.
+            <br />
+            Sudah pernah mendaftar?{" "}
+            <Link onClick={handleOpenLogin} className="cursor-pointer">
+              Login disini
+            </Link>
+          </Typography>
+          <Formik
+            children={Form}
+            initialValues={registerFormInitialValues}
+            onSubmit={handleSubmitForm}
+            validationSchema={formSchema}
+          />
+        </Paper>
+      </Container>
+    </>
   );
 };
 
