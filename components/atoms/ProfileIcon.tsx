@@ -3,7 +3,7 @@ import React, { ReactElement, FunctionComponent } from "react";
 
 export interface ProfileIcon {
   showBorder?: boolean;
-  children: ReactElement | string;
+  children?: ReactElement | string | null;
   onClick?: () => void;
 }
 

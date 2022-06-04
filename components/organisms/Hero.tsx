@@ -64,16 +64,35 @@ const Hero: FunctionComponent = () => {
                 {userData?.fullName}
               </Typography>
               <Typography fontWeight={500}>
-                Silahkan untuk mengunjungi halaman{" "}
-                <Link
-                  underline="always"
-                  href="/profile"
-                  color="inherit"
-                  fontWeight="bold"
-                >
-                  Profile
-                </Link>{" "}
-                untuk melihat informasi pendaftaran anda.
+                {!userData?.profileComplete ? (
+                  <>
+                    Sepertinya anda belum melengkapi identitas anda. Silahkan
+                    untuk melengkapi identitas anda pada halaman{" "}
+                    <Link
+                      underline="always"
+                      href="/profile"
+                      color="inherit"
+                      fontWeight="bold"
+                    >
+                      Profile
+                    </Link>{" "}
+                    agar mempermudah kami untuk mengelola pendataan calon siswa
+                    baru.
+                  </>
+                ) : (
+                  <>
+                    Silahkan untuk mengunjungi halaman{" "}
+                    <Link
+                      underline="always"
+                      href="/profile"
+                      color="inherit"
+                      fontWeight="bold"
+                    >
+                      Profile
+                    </Link>{" "}
+                    untuk melihat informasi pendaftaran anda.
+                  </>
+                )}
               </Typography>
             </>
           )}

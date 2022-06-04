@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { FunctionComponent, useEffect } from "react";
 import LoadingScreen from "../../components/atoms/LoadingScreen";
 import ToggleDarkModeButton from "../../components/atoms/ToggleDarkModeButton";
 import LoginBox from "../../components/organisms/LoginBox";

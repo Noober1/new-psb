@@ -36,6 +36,7 @@ import { openSnackbar } from "../../lib/redux/slices/noPersistConfig";
 import { runDevOnly } from "../../lib";
 import mediaQuery from "../hooks/mediaQuery";
 import ProfileIcon from "../atoms/ProfileIcon";
+import { useQueryClient } from "react-query";
 
 interface NavbarMenuList {
   text: string;
@@ -53,6 +54,7 @@ runDevOnly(() => {
 });
 
 const MainNavbar = () => {
+  const queryClient = useQueryClient();
   const confirmLogoutDialogRef = useRef<ConfirmDialogRef>(null);
   const [openProfileMenu, setopenProfileMenu] = useState<boolean>(false);
   const [openNavbarMenu, setOpenNavbarMenu] = useState<boolean>(false);
@@ -61,7 +63,11 @@ const MainNavbar = () => {
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
   const router = useRouter();
-  const [hideNavbarMenuByScreen] = mediaQuery("md");
+  const initialNameCondition =
+    isAuthenticated && userData?.firstName && userData?.lastName;
+  const initialName = initialNameCondition
+    ? userData?.firstName.charAt(0) + userData?.lastName.charAt(0)
+    : null;
 
   const handleToggleProfileMenu = () => {
     setopenProfileMenu((prevState) => !prevState);
@@ -95,30 +101,27 @@ const MainNavbar = () => {
     handleToggleProfileMenu();
   };
 
-  const handleConfirmLogout = async () => {
-    try {
-      const executeSignOut = await signOut({
-        redirect: false,
-      });
-
-      if (executeSignOut) {
-        handleCloseProfileMenu();
-        closeLoginPopup();
+  const handleConfirmLogout = () => {
+    signOut({
+      redirect: false,
+    })
+      .then((response) => {
         dispatch(
           openSnackbar({
             message: "Berhasil keluar",
             severity: "success",
           })
         );
-      }
-    } catch (error) {
-      dispatch(
-        openSnackbar({
-          message: "Gagal keluar",
-          severity: "error",
-        })
-      );
-    }
+        queryClient.resetQueries("user-data");
+      })
+      .catch((reason) => {
+        dispatch(
+          openSnackbar({
+            message: "Gagal keluar",
+            severity: "error",
+          })
+        );
+      });
   };
 
   return (
@@ -191,10 +194,7 @@ const MainNavbar = () => {
                   onClick={handleToggleProfileMenu}
                   showBorder={openProfileMenu}
                 >
-                  {isAuthenticated
-                    ? userData?.firstName?.charAt(0) +
-                      userData?.lastName?.charAt(0)
-                    : null}
+                  {initialName}
                 </ProfileIcon>
                 {openProfileMenu && (
                   <Paper

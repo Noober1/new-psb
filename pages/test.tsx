@@ -1,6 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { ReactElement, useEffect, useState } from "react";
+import { useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
 import PaperWithLoadingOverlay from "../components/atoms/PaperWithLoadingOverlay";
 import ProfileIcon from "../components/atoms/ProfileIcon";
@@ -10,6 +11,7 @@ import { openSnackbar } from "../lib/redux/slices/noPersistConfig";
 
 const TestPage: MainLayoutType = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const [showBorderProfile, setshowBorderProfile] = useState<boolean>(false);
   const [getServerSideSelect, setgetServerSideSelect] = useState<any>("");
   const handleOpenSnackbar = () => {
@@ -69,6 +71,9 @@ const TestPage: MainLayoutType = () => {
       {/* <Typography>ServerSideSelect value: {getServerSideSelect}</Typography> */}
       <Button onClick={() => setgetServerSideSelect("Teknik Kendaraan Ringan")}>
         Testing
+      </Button>
+      <Button onClick={() => queryClient.removeQueries("user-data")}>
+        remove user data
       </Button>
     </div>
   );

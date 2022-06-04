@@ -1,13 +1,22 @@
+import { AxiosResponse } from "axios";
 import { SessionContextValue, useSession } from "next-auth/react";
 import { useQueryClient } from "react-query";
 
-type UseUserData = [any, SessionContextValue["status"], any];
+interface UserdataQuery {
+  id: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  profileComplete: boolean;
+}
+
+type UseUserData = [UserdataQuery, SessionContextValue["status"], any];
 
 const useUserData = () => {
   const queryClient = useQueryClient();
   const { status } = useSession();
   const state = queryClient.getQueryState("user-data");
-  const data = queryClient.getQueryData<any>("user-data");
+  const data = queryClient.getQueryData<AxiosResponse>("user-data");
   const result: UseUserData = [data?.data, status, state];
   return result;
 };

@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { Formik } from "formik";
 import ToggleLoginBoxButton from "../atoms/ToggleLoginBoxButton";
 import Logo from "../atoms/Logo";
@@ -38,6 +38,18 @@ export type LoginBoxProps = PaperProps & {
 const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const redirectTo = router.query.redirectTo as string;
+  const [redirectToState, setredirectToState] = useState<boolean>(
+    redirectTo ? true : false
+  );
+  useEffect(() => {
+    if (redirectToState) {
+      setTimeout(() => {
+        setredirectToState(false);
+      }, 6000);
+    }
+  }, [redirectToState]);
+
   const loginAuthFormValues: LoginFormValues = {
     email: (router.query?.email as string) || "",
     password: (router.query?.phone as string) || "",
@@ -53,9 +65,10 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   ) => {
     setlockLoginBox(true);
     const result: any = await signIn("credentials", {
-      redirect: false,
+      redirect: redirectTo ? true : false,
       username: values.email,
       password: values.password,
+      callbackUrl: redirectTo ? redirectTo : undefined,
     });
 
     runDevOnly(() => {
@@ -132,6 +145,13 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
               <Alert severity="success" variant="filled" className="mx-3 mt-3">
                 Pendaftaran berhasil, silahkan untuk melakukan login
               </Alert>
+            )}
+            {redirectTo && (
+              <Collapse in={redirectToState}>
+                <Alert severity="info" variant="filled" className="mx-3 mt-3">
+                  Silahkan login untuk melanjutkan
+                </Alert>
+              </Collapse>
             )}
             <Collapse in={errorMessage.length > 0} orientation="vertical">
               <Alert severity="error" variant="filled" className="mx-3 mt-3">
