@@ -22,9 +22,7 @@ const About: MainLayoutType = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       session: await getSession(context),

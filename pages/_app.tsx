@@ -52,7 +52,7 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
           <UserDataProvider>
             <>
               {/* MUI CSS Baseline */}
-              <CssBaseline />
+              <CssBaseline enableColorScheme />
               {/* Progresbar */}
               <NextNProgress
                 color={colorPalette[isDarkMode ? "light" : "dark"].secondary}
@@ -75,7 +75,7 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
                 action={
                   <IconButton
                     onClick={() => handleCloseSnackbar()}
-                    color="secondary"
+                    color="inherit"
                   >
                     <CloseIcon />
                   </IconButton>

@@ -7,6 +7,8 @@ import {
   AutocompleteValue,
   CircularProgress,
   TextField,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import React, {
@@ -23,6 +25,7 @@ type ServerSideSelectProps = {
   label?: string;
   resultDataKey?: string;
   valueSelector: string;
+  value?: string;
   labelSelector: string;
   placeholder?: string;
   helperText?: string;
@@ -30,7 +33,7 @@ type ServerSideSelectProps = {
   onBlur?: (event: SyntheticEvent) => void;
   onChange?: (
     event: SyntheticEvent,
-    value: any,
+    newValue: any,
     reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<any>
   ) => void;
@@ -46,12 +49,35 @@ const ServerSideSelect = ({
   fullWidth,
   error,
   onBlur,
+  value,
   helperText,
   onChange,
 }: ServerSideSelectProps) => {
+  const theme = useTheme();
   const [open, setopen] = useState<boolean>(false);
   const [data, setData] = useState<Array<any>>([]);
   const [valueFromFetch, setvalueFromFetch] = useState<any>(undefined);
+
+  // if initial value is not empty
+  useEffect(() => {
+    if (value) {
+      (async () => {
+        try {
+          const fetching = await axios
+            .get(url)
+            .then((response) => response.data);
+          const findDataByInitialValue = fetching.find(
+            (item: any) => item[valueSelector] === value
+          );
+          if (findDataByInitialValue) {
+            setvalueFromFetch(findDataByInitialValue);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    }
+  }, []);
 
   const fetchingData = async (active: boolean) => {
     try {
@@ -69,12 +95,15 @@ const ServerSideSelect = ({
 
   const handleEvent: ServerSideSelectProps["onChange"] = (
     event,
-    value,
+    newValue,
     reason,
     details
   ) => {
-    if (onChange && value) {
-      onChange(event, value[valueSelector], reason, details);
+    if (onChange && newValue) {
+      onChange(event, newValue[valueSelector], reason, details);
+      if (value) {
+        setvalueFromFetch(newValue);
+      }
     }
   };
 
@@ -118,13 +147,12 @@ const ServerSideSelect = ({
     };
   }, [isLoading]);
 
-  useEffect(() => {
-    if (!open) {
-      setData([]);
-    }
-  }, [open]);
-
   //   TODO: harusnya tetep pake isOptionEqualValue,
+
+  if (!valueFromFetch && value)
+    return (
+      <TextField label={label} value="Memuat" disabled fullWidth={fullWidth} />
+    );
 
   return (
     <Autocomplete

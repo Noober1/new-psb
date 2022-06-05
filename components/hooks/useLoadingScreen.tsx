@@ -7,6 +7,10 @@ import {
   setLoadingScreenText,
 } from "../../lib/redux/slices/noPersistConfig";
 
+/**
+ * loading screen hook
+ * @returns [loadingScreen, handleOpen, handleClose, loadingScreenText]
+ */
 const useLoadingScreen = () => {
   const dispatch = useDispatch();
   const { loadingScreen, loadingScreenText } = useSelector(

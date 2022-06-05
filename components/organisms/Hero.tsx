@@ -76,7 +76,7 @@ const Hero: FunctionComponent = () => {
                     >
                       Profile
                     </Link>{" "}
-                    agar mempermudah kami untuk mengelola pendataan calon siswa
+                    agar mempermudah kami dalam mengelola pendataan calon siswa
                     baru.
                   </>
                 ) : (

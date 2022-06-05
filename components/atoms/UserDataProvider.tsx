@@ -21,10 +21,14 @@ const UserDataProvider = ({ children }: UserDataProvider) => {
     enabled: status !== "loading" && status === "authenticated" ? true : false,
   });
 
-  // if session status is not loading or react query is not loading(querying successfully)
-  if (status === "loading" || isLoading) return <LoadingScreen />;
+  const showLoadingScreen = status === "loading" || isLoading;
 
-  return children;
+  return (
+    <>
+      {children}
+      {showLoadingScreen && <LoadingScreen position="fixed" />}
+    </>
+  );
 };
 
 export default UserDataProvider;

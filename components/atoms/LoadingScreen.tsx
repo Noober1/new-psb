@@ -18,12 +18,13 @@ const LoadingScreen: FunctionComponent<LoadingScreen> = ({
   return (
     <Box
       className={clsx(
-        position == "fixed" && "fixed inset-0 z-10",
+        position == "fixed" && "fixed inset-0",
         "w-screen h-screen flex items-center flex-col justify-center overflow-hidden m-0 p-0"
       )}
       bgcolor={(theme) =>
         alpha(theme.palette.background.paper, backgroundOpacity || 1)
       }
+      zIndex={(theme) => theme.zIndex.appBar}
     >
       <LoadingLogo progress={0} enableDarkModeToggle />
       <Typography className="mt-5" variant="h4" textTransform="capitalize">

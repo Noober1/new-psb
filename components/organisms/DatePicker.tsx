@@ -49,6 +49,7 @@ const DateTimePicker = ({
           inputFormat="d MMMM y"
           onChange={onChange}
           value={value}
+          showDaysOutsideCurrentMonth
           renderInput={({ fullWidth, ...params }) => <TextField {...params} />}
           cancelText="Batalkan"
           okText="Pilih"

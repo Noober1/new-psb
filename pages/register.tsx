@@ -2,7 +2,6 @@ import {
   Button,
   Container,
   FormControl,
-  FormHelperText,
   InputLabel,
   Link,
   MenuItem,
@@ -11,22 +10,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
-import { Formik, FormikComputedProps, FormikProps, FormikState } from "formik";
+import { Formik, FormikProps } from "formik";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, {
-  ReactElement,
-  ReactNode,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import * as Yup from "yup";
+import React, { ReactElement, useEffect } from "react";
 import LoadingScreen from "../components/atoms/LoadingScreen";
-import PaperWithLoadingOverlay from "../components/atoms/PaperWithLoadingOverlay";
 import mediaQuery from "../components/hooks/mediaQuery";
 import useLoginPopup from "../components/hooks/useLoginPopup";
 import useUserData from "../components/hooks/useUserData";
@@ -35,30 +24,23 @@ import useLoadingScreen from "../components/hooks/useLoadingScreen";
 import ServerSideSelect from "../components/organisms/ServerSideSelect";
 import DatePicker from "../components/organisms/DatePicker";
 import {
-  GoogleReCaptcha,
   GoogleReCaptchaProvider,
   useGoogleReCaptcha,
 } from "react-google-recaptcha-v3";
 import fetchApi from "../lib/fetchApi";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import useSnackbar from "../components/hooks/useSnackbar";
 import Head from "next/head";
+import { BasicFormValues } from "../components/layouts/forms/BasicForm";
+import { registerSchema } from "../lib/formSchema";
+import { formError } from "../lib/formUtils";
 
-export interface RegisterFormValues {
-  firstName: string;
-  lastName: string;
+type RegisterFormValues = BasicFormValues & {
   nisn: string;
   phone: string;
-  sex: "L" | "P";
-  birthPlace: string;
-  birthDate: string;
-  lastEducation: "SMP" | "MTS";
-  lastSchool: string;
-  graduateYear: number;
   email: string;
-  selectedMajor: string;
   captchaToken: string;
-}
+};
 
 const registerFormInitialValues: RegisterFormValues = {
   firstName: "",
@@ -69,7 +51,7 @@ const registerFormInitialValues: RegisterFormValues = {
   email: "",
   graduateYear: new Date().getFullYear(),
   lastEducation: "SMP",
-  lastSchool: "",
+  lastEducationSchool: "",
   phone: "",
   selectedMajor: "",
   sex: "L",
@@ -79,44 +61,6 @@ const registerFormInitialValues: RegisterFormValues = {
 const graduateYearMin = 1990;
 const currentYear = new Date().getFullYear();
 const graduateYearOptions = currentYear - graduateYearMin + 1;
-
-const formSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .max(45, "Panjang maksimal 45 karakter")
-    .required("Nama depan harus diisi"),
-  lastName: Yup.string().max(45, "Panjang maksimal 45 karakter"),
-  middleName: Yup.string().max(10, "Panjang maksimal 10 karakter"),
-  nisn: Yup.string()
-    .min(8, "Panjang digit minimal 8 digit")
-    .max(10, "Panjang maksimal 10 karakter")
-    .required("NISN wajib diisi"),
-  birthDate: Yup.date().required("Tanggal lahir wajib diisi"),
-  birthPlace: Yup.string()
-    .max(15, "Panjang maksimal 15 karakter")
-    .required("Tempat lahir wajib diisi"),
-  email: Yup.string()
-    .email("Format alamat surel(email) tidak valid")
-    .max(50, "Panjang maksimal 50 karakter")
-    .required("Email wajib diisi"),
-  graduateYear: Yup.number()
-    .min(graduateYearMin)
-    .max(currentYear)
-    .required("Tahun lulus wajib diisi"),
-  lastEducation: Yup.string().required("Pendidikan terakhir wajib diisi"),
-  lastSchool: Yup.string().required("Asal sekolah wajib diisi"),
-  phone: Yup.string()
-    .matches(/^[0-9]*$/, "Nomor telpon invalid")
-    .max(15, "Panjang maksimal 15 digit angka tanpa simbol ataupun huruf")
-    .required("Nomor telpon wajib diisi"),
-  selectedMajor: Yup.string().required("Jurusan yang dipilih wajib diisi"),
-});
-
-const fakeFetch = () =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve("OK");
-    }, 5000);
-  });
 
 const Form = ({
   values,
@@ -128,14 +72,11 @@ const Form = ({
   setFieldValue,
   isSubmitting,
 }: FormikProps<RegisterFormValues>) => {
-  const isError = (field: keyof typeof registerFormInitialValues) => {
-    if (errors[field] && touched[field]) return true;
-    return false;
-  };
-
-  const helperText = (field: keyof typeof registerFormInitialValues) => {
-    if (errors[field] && touched[field]) return errors[field];
-  };
+  const { isError, helperText } = formError(
+    errors,
+    touched,
+    registerFormInitialValues
+  );
 
   return (
     <form className="grid grid-cols-4 gap-3 gap-y-5" onSubmit={handleSubmit}>
@@ -231,23 +172,22 @@ const Form = ({
           onChange={handleChange}
           required
         >
-          <MenuItem value="SMP">SMP</MenuItem>
-          <MenuItem value="MTS">MTs</MenuItem>
+          <MenuItem value="SMP">Sekolah Menengah Pertama(SMP)</MenuItem>
+          <MenuItem value="MTS">Madrasah Tsanawiyah(MTs)</MenuItem>
         </Select>
       </FormControl>
       <div className="col-span-4 md:col-span-2">
         <ServerSideSelect
-          error={isError("lastSchool")}
-          helperText={helperText("lastSchool")}
+          error={isError("lastEducationSchool")}
+          helperText={helperText("lastEducationSchool")}
           onBlur={handleBlur}
           label="Asal sekolah"
           placeholder="Silahkan pilih"
-          valueSelector="id"
-          labelSelector="text"
-          resultDataKey="results"
-          url="https://sas.binataruna.sch.id/AJAX/PSB_getsekolah"
+          valueSelector="kode"
+          labelSelector="nama_sekolah"
+          url={process.env.NEXT_PUBLIC_API_URL + "/ppdb/sekolah"}
           onChange={(event, value) => {
-            setFieldValue("lastSchool", value);
+            setFieldValue("lastEducationSchool", value);
           }}
         />
       </div>
@@ -282,10 +222,9 @@ const Form = ({
           onBlur={handleBlur}
           label="Jurusan yang dipilih"
           placeholder="Silahkan pilih"
-          valueSelector="id"
-          labelSelector="text"
-          resultDataKey="results"
-          url="https://sas.binataruna.sch.id/AJAX/PSB_getjurusan"
+          valueSelector="name"
+          labelSelector="name"
+          url={process.env.NEXT_PUBLIC_API_URL + "/ppdb/jurusan"}
           onChange={(event, value) => {
             setFieldValue("selectedMajor", value);
           }}
@@ -400,8 +339,8 @@ const RegisterPage: MainLayoutType = () => {
           <Formik
             children={Form}
             initialValues={registerFormInitialValues}
-            onSubmit={handleSubmitForm}
-            validationSchema={formSchema}
+            onSubmit={(values, action) => {}}
+            validationSchema={registerSchema}
           />
         </Paper>
       </Container>

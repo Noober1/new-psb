@@ -19,7 +19,7 @@ const MainLayout = ({ children }: { children: ReactElement }) => {
   );
 };
 
-export type MainLayoutType = NextPage & {
+export type MainLayoutType<T = {}> = NextPage<T> & {
   getLayout: (page: ReactElement) => ReactElement;
 };
 
