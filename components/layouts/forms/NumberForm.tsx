@@ -8,12 +8,12 @@ import { StudentBio } from "../../../types/bio";
 import useLoadingScreen from "../../hooks/useLoadingScreen";
 
 export interface NumberFormValues {
-  nisn: string;
-  phone: string;
-  kipkps?: string;
-  examNumber?: string;
-  certificateNumber?: string;
-  SKHUNNumber?: string;
+  nisn: StudentBio["numbers"]["NISN"];
+  phone: StudentBio["phone"];
+  kipkps?: StudentBio["numbers"]["KIPKPS"];
+  examNumber?: StudentBio["numbers"]["examNumber"];
+  certificateNumber?: StudentBio["numbers"]["certificateNumber"];
+  SKHUNNumber?: StudentBio["numbers"]["SKHUNNumber"];
 }
 
 const NumberForm = ({ data: userBio }: { data: StudentBio }) => {

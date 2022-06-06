@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { AdvancedFormValues } from "../components/layouts/forms/AdvancedForm";
 
 const graduateYearMin = 1990;
 const currentYear = new Date().getFullYear();
@@ -56,4 +57,74 @@ export const numberSchema = Yup.object().shape({
   examNumber: Yup.string().max(25, "Panjang maksimal 25 karakter"),
   certificateNumber: Yup.string().max(20, "Panjang maksimal 20 karakter"),
   SKHUNNumber: Yup.string().max(20, "Panjang maksimal 20 karakter"),
+});
+
+// andvance form schema
+export const advancedSchema = Yup.object().shape({
+  nickname: Yup.string().max(10, "Panjang maksimal 10 karakter"),
+  religion: Yup.string().oneOf([
+    "islam",
+    "kristen",
+    "hindu",
+    "budha",
+    "katolik",
+    "konghucu",
+    "lainnya",
+  ]),
+  nationality: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  adoptedSiblingCount: Yup.number()
+    .min(0, "Data tidak boleh negatif")
+    .typeError("Data harus berupa angka"),
+  childPosition: Yup.number()
+    .min(0, "Data tidak boleh negatif")
+    .typeError("Data harus berupa angka"),
+  familyStatus: Yup.string().oneOf([
+    "kandung",
+    "angkat",
+    "adopsi",
+    "lainnya",
+    "yatim",
+    "piatu",
+    "yatim piatu",
+  ]),
+  motherLanguage: Yup.string().max(20, "Panjang maksimal 20 karakter"),
+  siblingCount: Yup.number()
+    .typeError("Data harus berupa angka")
+    .min(0, "Data tidak boleh negatif"),
+  stepSiblingCount: Yup.number()
+    .typeError("Data harus berupa angka")
+    .min(0, "Data tidak boleh negatif"),
+});
+
+// address form schema
+export const addressSchema = Yup.object().shape({
+  street: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  village: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  district: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  city: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  province: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+});
+
+// additional schema
+export const additionalSchema = Yup.object().shape({
+  livingWith: Yup.string().max(20, "Panjang maksimal 20 karakter"),
+  weight: Yup.number()
+    .typeError("Data harus berupa angka")
+    .min(0, "Data tidak boleh negatif"),
+  height: Yup.number()
+    .typeError("Data harus berupa angka")
+    .min(0, "Data tidak boleh negatif"),
+  homeToSchoolDistance: Yup.number().min(0, "Data tidak boleh negatif"),
+  bloodType: Yup.string()
+    .oneOf(
+      ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+      "Data tidak valid"
+    )
+    .required("Data wajib diisi"),
+  seriousDisease: Yup.string()
+    .typeError("Data harus berupa angka")
+    .max(50, "Panjang maksimal 50 karakter"),
+  relapseDisease: Yup.string()
+    .typeError("Data harus berupa angka")
+    .max(50, "Panjang maksimal 50 karakter"),
 });

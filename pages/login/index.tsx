@@ -1,8 +1,10 @@
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { FunctionComponent, useEffect } from "react";
+import { useEffect } from "react";
+import HomeIcon from "@mui/icons-material/Home";
+import Link from "../../components/atoms/Link";
 import LoadingScreen from "../../components/atoms/LoadingScreen";
 import ToggleDarkModeButton from "../../components/atoms/ToggleDarkModeButton";
 import LoginBox from "../../components/organisms/LoginBox";
@@ -35,8 +37,16 @@ const LoginPage = () => {
           Pendaftaran Siswa Baru
         </Typography>
         <LoginBox elevation={1} />
-        <div className="text-center w-full my-5">
+        <div className="text-center w-full my-5 flex gap-2 justify-center">
           <ToggleDarkModeButton buttonType="button" />
+          <Button
+            variant="contained"
+            startIcon={<HomeIcon />}
+            LinkComponent={Link}
+            href="/"
+          >
+            Ke beranda
+          </Button>
         </div>
       </div>
     </div>

@@ -43,7 +43,14 @@ export interface StudentBio {
     siblingCount: number | null;
     stepSiblingCount: number | null;
     adoptedSiblingCount: number | null;
-    familyStatus: "kandung" | "yatim" | "piatu" | "yatimpiatu";
+    familyStatus:
+      | "kandung"
+      | "angkat"
+      | "adopsi"
+      | "lainnya"
+      | "yatim"
+      | "piatu"
+      | "yatim piatu";
   };
   motherLanguage: string | null;
   livingWith: string | null;

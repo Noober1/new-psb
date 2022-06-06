@@ -25,6 +25,7 @@ export type DateTimePickerProps = {
     date: any | undefined,
     keyboardInputValue: string | undefined
   ) => void;
+  required?: boolean;
 };
 
 const DateTimePicker = ({
@@ -33,6 +34,7 @@ const DateTimePicker = ({
   label,
   error,
   helperText,
+  required,
 }: DateTimePickerProps) => {
   // const { languange, default:defaultText } = useLocalization()
   const [dateValue, setDateValue] =
@@ -41,10 +43,13 @@ const DateTimePicker = ({
   return (
     <LocalizationProvider locale={idLocale} dateAdapter={AdapterDateFns} f>
       <FormControl error={error} fullWidth>
-        <InputLabel shrink={true}>{label}</InputLabel>
+        <InputLabel shrink={true} required={required}>
+          {label}
+        </InputLabel>
         <MobileDatePicker
           InputProps={{
             error: error,
+            required,
           }}
           inputFormat="d MMMM y"
           onChange={onChange}

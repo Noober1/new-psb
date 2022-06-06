@@ -18,16 +18,16 @@ import DatePicker from "../../organisms/DatePicker";
 import ServerSideSelect from "../../organisms/ServerSideSelect";
 
 export interface BasicFormValues {
-  firstName: string;
-  lastName: string;
-  email: string;
-  birthPlace: string;
-  birthDate: string;
-  sex: "L" | "P";
-  lastEducation: "SMP" | "MTS";
-  lastEducationSchool: string;
-  graduateYear: number;
-  selectedMajor: string;
+  firstName: StudentBio["name"]["firstName"];
+  lastName: StudentBio["name"]["lastName"];
+  email: StudentBio["email"];
+  birthPlace: StudentBio["birth"]["place"];
+  birthDate: StudentBio["birth"]["date"];
+  sex: StudentBio["body"]["sex"];
+  lastEducation: StudentBio["lastEducation"]["grade"];
+  lastEducationSchool: StudentBio["lastEducation"]["school"];
+  graduateYear: StudentBio["lastEducation"]["graduateYear"];
+  selectedMajor: StudentBio["selectedMajor"];
 }
 
 const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
@@ -98,6 +98,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
               onBlur={handleBlur}
               value={values.firstName}
               onChange={handleChange}
+              required
             />
             <TextField
               className="col-span-4 sm:col-span-2 capitalize"
@@ -126,6 +127,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
               onBlur={handleBlur}
               value={values.birthPlace}
               onChange={handleChange}
+              required
             />
             <div className="col-span-4 sm:col-span-2">
               <DatePicker
@@ -136,10 +138,11 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
                 onChange={(value) =>
                   setFieldValue("birthDate", value.toISOString())
                 }
+                required
               />
             </div>
             <FormControl className="col-span-4 sm:col-span-2">
-              <InputLabel>Jenis kelamin</InputLabel>
+              <InputLabel required>Jenis kelamin</InputLabel>
               <Select
                 label="Jenis kelamin"
                 name="sex"
@@ -153,7 +156,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
               </Select>
             </FormControl>
             <FormControl className="col-span-4 lg:col-span-2">
-              <InputLabel>Pendidikan Terakhir</InputLabel>
+              <InputLabel required>Pendidikan Terakhir</InputLabel>
               <Select
                 label="Pendidikan Terakhir"
                 name="lastEducation"
@@ -180,10 +183,11 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
                 onChange={(event, value) => {
                   setFieldValue("lastEducationSchool", value);
                 }}
+                required
               />
             </div>
             <FormControl className="col-span-4 md:col-span-2">
-              <InputLabel>Tahun lulus</InputLabel>
+              <InputLabel required>Tahun lulus</InputLabel>
               <Select
                 label="Tahun lulus"
                 name="graduateYear"
@@ -220,6 +224,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
                 onChange={(event, value) => {
                   setFieldValue("selectedMajor", value);
                 }}
+                required
               />
             </div>
             <div className="flex items-center justify-center col-span-4 md:col-span-2">

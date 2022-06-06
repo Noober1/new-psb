@@ -18,6 +18,10 @@ import NumberForm from "../../../components/layouts/forms/NumberForm";
 import MainLayout, { MainLayoutType } from "../../../components/layouts/Main";
 import { StudentBio } from "../../../types/bio";
 import Link from "../../../components/atoms/Link";
+import AdvancedForm from "../../../components/layouts/forms/AdvancedForm";
+import AddressForm from "../../../components/layouts/forms/AddressForm";
+import Head from "next/head";
+import AdditionalForm from "../../../components/layouts/forms/AdditionalForm";
 
 const categoryList = [
   "basic",
@@ -49,7 +53,7 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
   if (status === "unauthenticated") return <LoadingScreen position="fixed" />;
 
   return (
-    <Container maxWidth="xl" className="mt-24 flex flex-col gap-2">
+    <Container maxWidth="xl" className="mt-24 mb-5 flex flex-col gap-2">
       <Box className="text-center md:text-left">
         <Button
           startIcon={<BackIcon />}
@@ -72,6 +76,12 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
           <BasicForm data={biodata} />
         ) : category === "number" ? (
           <NumberForm data={biodata} />
+        ) : category === "advanced" ? (
+          <AdvancedForm data={biodata} />
+        ) : category === "address" ? (
+          <AddressForm data={biodata} />
+        ) : category === "additional" ? (
+          <AdditionalForm data={biodata} />
         ) : (
           <Box>manakutau</Box>
         )}
@@ -80,7 +90,14 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
   );
 };
 
-EditProfile.getLayout = (page: ReactElement) => <MainLayout>{page}</MainLayout>;
+EditProfile.getLayout = (page: ReactElement) => (
+  <>
+    <Head>
+      <title>Edit Profile</title>
+    </Head>
+    <MainLayout>{page}</MainLayout>
+  </>
+);
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {

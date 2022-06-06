@@ -37,6 +37,7 @@ type ServerSideSelectProps = {
     reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<any>
   ) => void;
+  required?: boolean;
 };
 
 const ServerSideSelect = ({
@@ -52,25 +53,29 @@ const ServerSideSelect = ({
   value,
   helperText,
   onChange,
+  required,
 }: ServerSideSelectProps) => {
-  const theme = useTheme();
   const [open, setopen] = useState<boolean>(false);
   const [data, setData] = useState<Array<any>>([]);
-  const [valueFromFetch, setvalueFromFetch] = useState<any>(undefined);
+  const [valueFromFetch, setvalueFromFetch] = useState<any>(null);
+  const isInitialMount = useRef(true);
 
   // if initial value is not empty
   useEffect(() => {
-    if (value) {
+    if (typeof value !== "undefined") {
       (async () => {
         try {
           const fetching = await axios
             .get(url)
             .then((response) => response.data);
-          const findDataByInitialValue = fetching.find(
-            (item: any) => item[valueSelector] === value
-          );
-          if (findDataByInitialValue) {
-            setvalueFromFetch(findDataByInitialValue);
+          const dataToFind = resultDataKey ? fetching[resultDataKey] : fetching;
+          if (dataToFind) {
+            const findDataByInitialValue = dataToFind.find(
+              (item: any) => item[valueSelector] === value
+            );
+            if (findDataByInitialValue) {
+              setvalueFromFetch(findDataByInitialValue);
+            }
           }
         } catch (error) {
           console.log(error);
@@ -101,6 +106,7 @@ const ServerSideSelect = ({
   ) => {
     if (onChange && newValue) {
       onChange(event, newValue[valueSelector], reason, details);
+
       if (value) {
         setvalueFromFetch(newValue);
       }
@@ -114,6 +120,7 @@ const ServerSideSelect = ({
         label={label ?? "No label"}
         InputLabelProps={{
           shrink: true,
+          required,
         }}
         placeholder={placeholder}
         helperText={helperText}
@@ -147,11 +154,24 @@ const ServerSideSelect = ({
     };
   }, [isLoading]);
 
+  useEffect(() => {
+    if (isInitialMount.current) {
+      fetchingData(true);
+      setvalueFromFetch(null);
+    }
+  }, [url]);
+
   //   TODO: harusnya tetep pake isOptionEqualValue,
 
-  if (!valueFromFetch && value)
+  if (!valueFromFetch && value && !value)
     return (
-      <TextField label={label} value="Memuat" disabled fullWidth={fullWidth} />
+      <TextField
+        label={label}
+        value="Memuat"
+        disabled
+        fullWidth
+        required={required}
+      />
     );
 
   return (
