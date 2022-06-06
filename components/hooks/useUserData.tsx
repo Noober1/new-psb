@@ -1,13 +1,14 @@
 import { AxiosResponse } from "axios";
 import { SessionContextValue, useSession } from "next-auth/react";
 import { useQueryClient } from "react-query";
+import { BioEditProgress } from "../../types/bio";
 
 interface UserdataQuery {
   id: string;
   firstName: string;
   lastName: string;
   fullName: string;
-  profileComplete: boolean;
+  bioEditComplete: BioEditProgress;
 }
 
 type UseUserData = [UserdataQuery, SessionContextValue["status"], any];

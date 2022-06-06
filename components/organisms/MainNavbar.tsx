@@ -63,8 +63,7 @@ const MainNavbar = () => {
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
   const router = useRouter();
-  const initialNameCondition =
-    isAuthenticated && userData?.firstName && userData?.lastName;
+  const initialNameCondition = isAuthenticated && userData?.firstName;
   const initialName = initialNameCondition
     ? userData?.firstName.charAt(0) + userData?.lastName.charAt(0)
     : null;

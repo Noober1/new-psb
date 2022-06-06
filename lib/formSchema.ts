@@ -128,3 +128,58 @@ export const additionalSchema = Yup.object().shape({
     .typeError("Data harus berupa angka")
     .max(50, "Panjang maksimal 50 karakter"),
 });
+
+// fatherFullname: userBio?.father.fullName || "",
+//   fatherBirthDate: userBio?.father.birthDate || "",
+//   fatherNationality: userBio?.father.nationality || "",
+//   fatherEducation: userBio?.father.education || null,
+//   fatherOccupation: userBio?.father.occupation || "",
+//   fatherIncome: userBio?.father.income || 0,
+//   fatherAddress: userBio?.father.address || "",
+
+const parentEducationList = [
+  "PAUD",
+  "TK",
+  "SD",
+  "MI",
+  "SMP",
+  "MTS",
+  "SMK",
+  "SMA",
+  "MA",
+  "D1",
+  "D2",
+  "D3",
+  "S1",
+  "S2",
+  "S3",
+];
+
+const _parentSchema = {
+  fullname: Yup.string().max(50, "Panjang maksimal 50 karakter"),
+  birthDate: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  nationality: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  education: Yup.string().oneOf(parentEducationList, "Data invalid"),
+  occupation: Yup.string().max(20, "Panjang maksimal 20 karakter"),
+  income: Yup.number()
+    .max(9999999999, "Data tidak boleh lebih dari 999,999,999,999")
+    .min(0, "Data tidak boleh negatif"),
+  address: Yup.string().max(75, "Panjang maksimal 75 karakter"),
+};
+
+export const parentSchema = Yup.object().shape({
+  fatherFullname: _parentSchema.fullname,
+  fatherBirthDate: _parentSchema.birthDate,
+  fatherNationality: _parentSchema.nationality,
+  fatherEducation: _parentSchema.education,
+  fatherOccupation: _parentSchema.occupation,
+  fatherIncome: _parentSchema.income,
+  fatherAddress: _parentSchema.address,
+  motherFullname: _parentSchema.fullname,
+  motherBirthDate: _parentSchema.birthDate,
+  motherNationality: _parentSchema.nationality,
+  motherEducation: _parentSchema.education,
+  motherOccupation: _parentSchema.occupation,
+  motherIncome: _parentSchema.income,
+  motherAddress: _parentSchema.address,
+});

@@ -35,7 +35,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "../../components/atoms/Link";
 import mediaQuery from "../../components/hooks/mediaQuery";
-import PageLoading from "../../components/organisms/PageLoading";
+import CheckIcon from "@mui/icons-material/CheckCircleOutlined";
 import LoadingScreen from "../../components/atoms/LoadingScreen";
 
 const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
@@ -118,13 +118,6 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
             <Button variant="contained">
               {downMd ? "Cetak" : "Cetak info pendaftaran"}
             </Button>
-            <Button
-              LinkComponent={Link}
-              href="/profile/edit"
-              variant="contained"
-            >
-              {downMd ? "Edit" : "Edit Profile"}
-            </Button>
           </Box>
         </Paper>
         <Paper className="mb-5">
@@ -139,7 +132,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                   color: (theme) => theme.palette.primary.contrastText,
                 }}
               >
-                <Typography className="text-5xl">
+                <Typography className="text-5xl uppercase">
                   {data?.name.initial || null}
                 </Typography>
               </Box>
@@ -260,12 +253,56 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                   allowScrollButtonsMobile
                   onChange={handleTabChange}
                 >
-                  <Tab label="Dasar" value="basic" />
-                  <Tab label="Nomor" value="number" />
-                  <Tab label="Lanjutan" value="advanced" />
-                  <Tab label="Alamat" value="address" />
-                  <Tab label="Tambahan" value="additional" />
-                  <Tab label="Orang tua" value="parent" />
+                  <Tab
+                    label="Dasar"
+                    value="basic"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.basic ? <CheckIcon /> : undefined
+                    }
+                  />
+                  <Tab
+                    label="Nomor"
+                    value="number"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.number ? <CheckIcon /> : undefined
+                    }
+                  />
+                  <Tab
+                    label="Lanjutan"
+                    value="advanced"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.advanced ? <CheckIcon /> : undefined
+                    }
+                  />
+                  <Tab
+                    label="Alamat"
+                    value="address"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.address ? <CheckIcon /> : undefined
+                    }
+                  />
+                  <Tab
+                    label="Tambahan"
+                    value="additional"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.additional ? (
+                        <CheckIcon />
+                      ) : undefined
+                    }
+                  />
+                  <Tab
+                    label="Orang tua"
+                    value="parent"
+                    iconPosition="start"
+                    icon={
+                      data?.bioEditProgress.parent ? <CheckIcon /> : undefined
+                    }
+                  />
                 </TabList>
               </Box>
               <Box className="p-3 px-5 flex justify-between items-center flex-col sm:flex-row">
@@ -336,7 +373,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Asal sekolah"
-                        secondary={data?.lastEducation.school}
+                        secondary={data?.lastEducation.school.name}
                       />
                     </ListItem>
                     <ListItem>
@@ -470,25 +507,25 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Provinsi"
-                        secondary={data?.address.province || "-"}
+                        secondary={data?.address.province.name || "-"}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Kabupaten"
-                        secondary={data?.address.city || "-"}
+                        secondary={data?.address.city.name || "-"}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Desa/kecamatan"
-                        secondary={data?.address.district || "-"}
+                        secondary={data?.address.district.name || "-"}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Kampung/desa"
-                        secondary={data?.address.village || "-"}
+                        secondary={data?.address.village.name || "-"}
                       />
                     </ListItem>
                     <ListItem>

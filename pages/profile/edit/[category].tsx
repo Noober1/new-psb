@@ -20,6 +20,7 @@ import { StudentBio } from "../../../types/bio";
 import Link from "../../../components/atoms/Link";
 import AdvancedForm from "../../../components/layouts/forms/AdvancedForm";
 import AddressForm from "../../../components/layouts/forms/AddressForm";
+import ParentForm from "../../../components/layouts/forms/ParentForm";
 import Head from "next/head";
 import AdditionalForm from "../../../components/layouts/forms/AdditionalForm";
 
@@ -83,7 +84,7 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
         ) : category === "additional" ? (
           <AdditionalForm data={biodata} />
         ) : (
-          <Box>manakutau</Box>
+          <ParentForm data={biodata} />
         )}
       </Paper>
     </Container>

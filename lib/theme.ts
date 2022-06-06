@@ -62,6 +62,14 @@ const MuiTextField = {
   },
 };
 
+const MuiTab = {
+  styleOverrides: {
+    labelIcon: {
+      minHeight: 0,
+    },
+  },
+};
+
 const light = createTheme({
   typography,
   breakpoints,
@@ -81,6 +89,7 @@ const light = createTheme({
     MuiButton,
     MuiLink,
     MuiTextField,
+    MuiTab,
   },
 });
 
@@ -100,6 +109,7 @@ const dark = createTheme({
     MuiButton,
     MuiLink,
     MuiTextField,
+    MuiTab,
   },
 });
 

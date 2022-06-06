@@ -1,5 +1,45 @@
+type ParentEducation =
+  | "PAUD"
+  | "TK"
+  | "SD"
+  | "MI"
+  | "SMP"
+  | "MTS"
+  | "SMK"
+  | "SMA"
+  | "MA"
+  | "D1"
+  | "D2"
+  | "D3"
+  | "S1"
+  | "S2"
+  | "S3";
+
+interface ParentType {
+  fullName?: string | null;
+  birthDate?: string | null;
+  nationality?: string | null;
+  education?: ParentEducation | null;
+  occupation?: string | null;
+  income?: number | null;
+  address?: string | null;
+}
+
+interface Address {
+  code: string | null;
+  name: string | null;
+}
+
+export interface BioEditProgress {
+  basic: boolean;
+  number: boolean;
+  parent: boolean;
+  address: boolean;
+  advanced: boolean;
+  additional: boolean;
+}
+
 export interface StudentBio {
-  id: number;
   PPDBYear: number;
   registerNumber: string;
   registerDate: string;
@@ -57,39 +97,37 @@ export interface StudentBio {
   homeToSchoolDistance: number | null;
   address: {
     street: string | null;
-    village: string | null;
-    district: string | null;
-    city: string | null;
-    province: string | null;
+    village: Address;
+    district: Address;
+    city: Address;
+    province: Address;
     postalCode: number | null;
   };
   body: {
     sex: "L" | "P";
     weight: number | null;
     height: number | null;
-    bloodType: "A+" | "A-" | "B+" | "B-" | "O+" | "O-" | "AB+" | "AB-";
+    bloodType:
+      | "A+"
+      | "A-"
+      | "B+"
+      | "B-"
+      | "O+"
+      | "O-"
+      | "AB+"
+      | "AB-"
+      | null
+      | "";
   };
   lastEducation: {
     grade: "SMP" | "MTS";
-    school: string;
+    school: {
+      code: string | null;
+      name: string | null;
+    };
     graduateYear: number;
   };
-  father: {
-    fullName: string | null;
-    birthDate: string | null;
-    nationality: string | null;
-    education: string | null;
-    occupation: string | null;
-    income: number | null;
-    address: string | null;
-  };
-  mother: {
-    fullName: string | null;
-    birthDate: string | null;
-    nationality: string | null;
-    education: string | null;
-    occupation: string | null;
-    income: number | null;
-    address: string | null;
-  };
+  father: ParentType;
+  mother: ParentType;
+  bioEditProgress: BioEditProgress;
 }

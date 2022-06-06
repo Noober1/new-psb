@@ -29,7 +29,7 @@ export interface AdditionalFormValues {
 
 const AdditionalForm = ({ data: userBio }: { data: StudentBio }) => {
   const initialValues: AdditionalFormValues = {
-    bloodType: userBio?.body?.bloodType || null,
+    bloodType: userBio?.body?.bloodType || "",
     weight: userBio?.body?.weight || 0,
     height: userBio?.body?.height || 0,
     homeToSchoolDistance: userBio?.homeToSchoolDistance || 0,

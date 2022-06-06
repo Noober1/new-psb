@@ -10,7 +10,10 @@ type useSnackbarProps = {
   message?: string;
   severity?: "success" | "info" | "warning" | "error";
 };
-
+/**
+ * main snackbar hook
+ * @returns Object
+ */
 const useSnackbar = () => {
   const dispatch = useDispatch();
   const handleOpenSnackbar = (options: useSnackbarProps) => {

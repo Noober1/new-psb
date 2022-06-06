@@ -14,28 +14,28 @@ export interface AddressFormValues {
   district?: string;
   city?: string;
   province?: string;
-  postalCode?: number;
+  postalCode?: number | "";
 }
 
 const AddressForm = ({ data: userBio }: { data: StudentBio }) => {
   // address form states
   const [provinces, setprovinces] = useState<string | null>(
-    userBio?.address.province || null
+    userBio?.address.province.code || null
   );
   const [city, setcity] = useState<string | null>(
-    userBio?.address.city || null
+    userBio?.address.city.code || null
   );
   const [district, setdistrict] = useState<string | null>(
-    userBio?.address.district || null
+    userBio?.address.district.code || null
   );
 
   const initialValues: AddressFormValues = {
     street: userBio?.address.street || "",
-    province: userBio?.address.province || "",
-    village: userBio?.address.village || "",
-    district: userBio?.address.district || "",
-    city: userBio?.address.city || "",
-    postalCode: userBio?.address.postalCode || 0,
+    province: userBio?.address.province.code || "",
+    village: userBio?.address.village.code || "",
+    district: userBio?.address.district.code || "",
+    city: userBio?.address.city.code || "",
+    postalCode: userBio?.address.postalCode || "",
   };
 
   const [loadingScreen, openLoadingScreen, closeLoadingScreen] =
@@ -91,6 +91,17 @@ const AddressForm = ({ data: userBio }: { data: StudentBio }) => {
               placeholder="Contoh:Jl. Semanggi No. 1 RT. 001/RW. 001"
               onBlur={handleBlur}
               value={values.street}
+              onChange={handleChange}
+            />
+            <TextField
+              className="col-span-4 sm:col-span-2"
+              error={isError("postalCode")}
+              label="Kode POS"
+              name="postalCode"
+              helperText={helperText("postalCode")}
+              placeholder="Kode POS"
+              onBlur={handleBlur}
+              value={values.postalCode}
               onChange={handleChange}
             />
             <Box className="col-span-4">

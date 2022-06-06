@@ -7,13 +7,18 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import axios from "axios";
 import { Formik, FormikHelpers } from "formik";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
+import { useMutation, useQueryClient } from "react-query";
 import { runDevOnly } from "../../../lib";
 import { basicSchema } from "../../../lib/formSchema";
 import { formError } from "../../../lib/formUtils";
 import { StudentBio } from "../../../types/bio";
 import useLoadingScreen from "../../hooks/useLoadingScreen";
+import useSnackbar from "../../hooks/useSnackbar";
 import DatePicker from "../../organisms/DatePicker";
 import ServerSideSelect from "../../organisms/ServerSideSelect";
 
@@ -25,12 +30,16 @@ export interface BasicFormValues {
   birthDate: StudentBio["birth"]["date"];
   sex: StudentBio["body"]["sex"];
   lastEducation: StudentBio["lastEducation"]["grade"];
-  lastEducationSchool: StudentBio["lastEducation"]["school"];
+  lastEducationSchool: StudentBio["lastEducation"]["school"]["code"];
   graduateYear: StudentBio["lastEducation"]["graduateYear"];
   selectedMajor: StudentBio["selectedMajor"];
 }
 
 const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
+  const router = useRouter();
+  const { handleOpenSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+
   const initialValues: BasicFormValues = {
     firstName: userBio?.name.firstName || "",
     lastName: userBio?.name.lastName || "",
@@ -39,7 +48,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
     birthDate: userBio?.birth.date || new Date().toISOString(),
     sex: userBio?.body.sex || "L",
     lastEducation: userBio?.lastEducation.grade || "SMP",
-    lastEducationSchool: userBio?.lastEducation.school || "",
+    lastEducationSchool: userBio?.lastEducation.school.code || "",
     graduateYear:
       userBio?.lastEducation.graduateYear || new Date().getFullYear(),
     selectedMajor: userBio?.selectedMajor || "",
@@ -47,6 +56,30 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
 
   const [loadingScreen, openLoadingScreen, closeLoadingScreen] =
     useLoadingScreen();
+
+  // updating functions
+  const { data: session } = useSession();
+  const updateBio = async (data: BasicFormValues) => {
+    if (!session?.accessToken) {
+      throw new Error("access token not found");
+    }
+    const url = process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio/basic";
+    const response = await axios
+      .put(url, data, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+      .then((result) => result.data);
+
+    if (!response) {
+      throw new Error("Error updating bio");
+    }
+
+    return response;
+  };
+
+  const mutation = useMutation(updateBio);
 
   const submitForm = (
     values: BasicFormValues,
@@ -56,10 +89,20 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
       console.log(values);
     });
     openLoadingScreen("Menyimpan data");
-    setTimeout(() => {
-      closeLoadingScreen();
-      action.setSubmitting(false);
-    }, 5000);
+    mutation.mutate(values, {
+      onSuccess: () => {
+        queryClient.invalidateQueries("user-data");
+        router.push("/profile");
+        handleOpenSnackbar({
+          message: "Data berhasil disimpan",
+        });
+        closeLoadingScreen();
+      },
+      onError: () => {
+        action.setSubmitting(false);
+        closeLoadingScreen();
+      },
+    });
   };
 
   return (
@@ -173,7 +216,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
               <ServerSideSelect
                 error={isError("lastEducationSchool")}
                 helperText={helperText("lastEducationSchool")}
-                value={values.lastEducation}
+                value={values.lastEducationSchool}
                 onBlur={handleBlur}
                 label="Asal sekolah"
                 placeholder="Silahkan pilih"

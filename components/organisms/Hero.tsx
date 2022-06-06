@@ -9,6 +9,7 @@ const Hero: FunctionComponent = () => {
   const [toggleLoginBox] = useLoginPopup();
   const [userData, userStatus] = useUserData();
   const isAuthenticated = userStatus === "authenticated";
+
   return (
     <Box
       className="hero hero-image"
@@ -64,35 +65,16 @@ const Hero: FunctionComponent = () => {
                 {userData?.fullName}
               </Typography>
               <Typography fontWeight={500}>
-                {!userData?.profileComplete ? (
-                  <>
-                    Sepertinya anda belum melengkapi identitas anda. Silahkan
-                    untuk melengkapi identitas anda pada halaman{" "}
-                    <Link
-                      underline="always"
-                      href="/profile"
-                      color="inherit"
-                      fontWeight="bold"
-                    >
-                      Profile
-                    </Link>{" "}
-                    agar mempermudah kami dalam mengelola pendataan calon siswa
-                    baru.
-                  </>
-                ) : (
-                  <>
-                    Silahkan untuk mengunjungi halaman{" "}
-                    <Link
-                      underline="always"
-                      href="/profile"
-                      color="inherit"
-                      fontWeight="bold"
-                    >
-                      Profile
-                    </Link>{" "}
-                    untuk melihat informasi pendaftaran anda.
-                  </>
-                )}
+                Silahkan untuk mengunjungi halaman{" "}
+                <Link
+                  underline="always"
+                  href="/profile"
+                  color="inherit"
+                  fontWeight="bold"
+                >
+                  Profile
+                </Link>{" "}
+                untuk melihat informasi pendaftaran anda.
               </Typography>
             </>
           )}
