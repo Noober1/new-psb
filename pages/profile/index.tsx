@@ -117,7 +117,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
 
   return (
     <>
-      <Container maxWidth="xl" className="my-24 grid grid-cols-1 gap-4">
+      <Container maxWidth="xl" className="mt-6 grid grid-cols-1 gap-4">
         <Paper className="p-2 md:flex text-center justify-between items-center">
           <Box className="flex gap-2 justify-center">
             {isLoading ? (

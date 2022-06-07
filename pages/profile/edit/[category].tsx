@@ -54,7 +54,7 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
   if (status === "unauthenticated") return <LoadingScreen position="fixed" />;
 
   return (
-    <Container maxWidth="xl" className="mt-24 mb-5 flex flex-col gap-2">
+    <Container maxWidth="xl" className="mt-2 flex flex-col gap-2">
       <Box className="text-center md:text-left">
         <Button
           startIcon={<BackIcon />}

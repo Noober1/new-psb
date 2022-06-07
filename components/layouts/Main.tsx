@@ -3,6 +3,9 @@ import { NextPage } from "next";
 import { runDevOnly } from "../../lib";
 import { ReactElement } from "react";
 import MainNavbar from "../organisms/MainNavbar";
+import { AppBar } from "@mui/material";
+import { Container } from "@mui/system";
+import MainFooter from "../organisms/MainFooter";
 
 const MainLayout = ({ children }: { children: ReactElement }) => {
   runDevOnly(() => {
@@ -13,8 +16,13 @@ const MainLayout = ({ children }: { children: ReactElement }) => {
 
   return (
     <>
-      <MainNavbar />
-      <main id="main-wrapper">{children}</main>
+      <div className="pt-20">
+        <MainNavbar />
+        <main id="main-wrapper" className="mb-5">
+          {children}
+        </main>
+      </div>
+      <MainFooter />
     </>
   );
 };

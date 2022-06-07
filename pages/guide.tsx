@@ -16,7 +16,7 @@ import MainLayout, { MainLayoutType } from "../components/layouts/Main";
 
 const GuidePage: MainLayoutType = () => {
   return (
-    <Container className="mt-24" maxWidth="xl" component="article">
+    <Container className="mt-6" maxWidth="xl" component="article">
       <Paper className="p-5" component="section">
         <Typography component="h1" variant="h4" fontWeight="bold" gutterBottom>
           Panduan Pendaftaran
