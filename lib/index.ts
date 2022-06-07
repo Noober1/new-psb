@@ -1,5 +1,7 @@
 const runDevOnly = (callback: Function) => {
-  callback();
+  if (process.env.NODE_ENV == "development") {
+    callback();
+  }
 };
 
 export { runDevOnly };

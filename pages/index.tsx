@@ -27,6 +27,10 @@ Home.getLayout = (page: ReactElement) => (
   <>
     <Head>
       <title>Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak</title>
+      <meta
+        name="description"
+        content="Selamat datang di situs Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak. Sekolah Menengah Kejuruan yang ada di Kota Subang - Jawa Barat."
+      />
     </Head>
     <MainLayout>{page}</MainLayout>
   </>
