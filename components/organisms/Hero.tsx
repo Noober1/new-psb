@@ -12,6 +12,7 @@ const Hero: FunctionComponent = () => {
 
   return (
     <Box
+      component="section"
       className="hero hero-image"
       sx={{
         "&::after": {

@@ -1,12 +1,18 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import axios from "axios";
 import { Formik, FormikHelpers } from "formik";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useMutation } from "react-query";
 import { runDevOnly } from "../../../lib";
 import { addressSchema } from "../../../lib/formSchema";
 import { formError } from "../../../lib/formUtils";
 import { StudentBio } from "../../../types/bio";
 import useLoadingScreen from "../../hooks/useLoadingScreen";
+import useSnackbar from "../../hooks/useSnackbar";
 import ServerSideSelect from "../../organisms/ServerSideSelect";
+import { AdvancedFormValues } from "./AdvancedForm";
 
 export interface AddressFormValues {
   street?: string;
@@ -18,6 +24,9 @@ export interface AddressFormValues {
 }
 
 const AddressForm = ({ data: userBio }: { data: StudentBio }) => {
+  const router = useRouter();
+  const { handleOpenSnackbar } = useSnackbar();
+
   // address form states
   const [provinces, setprovinces] = useState<string | null>(
     userBio?.address.province.code || null
@@ -41,6 +50,29 @@ const AddressForm = ({ data: userBio }: { data: StudentBio }) => {
   const [loadingScreen, openLoadingScreen, closeLoadingScreen] =
     useLoadingScreen();
 
+  // updating functions
+  const { data: session } = useSession();
+  const updateBio = async (data: AddressFormValues) => {
+    if (!session?.accessToken) {
+      throw new Error("access token not found");
+    }
+    const url = process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio/address";
+    const response = await axios
+      .put(url, data, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+      .then((result) => result.data);
+
+    if (!response) {
+      throw new Error("Error updating bio");
+    }
+
+    return response;
+  };
+  const mutation = useMutation(updateBio);
+
   const submitForm = (
     values: AddressFormValues,
     action: FormikHelpers<AddressFormValues>
@@ -49,10 +81,22 @@ const AddressForm = ({ data: userBio }: { data: StudentBio }) => {
       console.log(values);
     });
     openLoadingScreen("Menyimpan data");
-    setTimeout(() => {
-      closeLoadingScreen();
-      action.setSubmitting(false);
-    }, 5000);
+    mutation.mutate(values, {
+      onSuccess: () => {
+        router.push("/profile");
+        handleOpenSnackbar({
+          message: "Data berhasil disimpan",
+        });
+        closeLoadingScreen();
+      },
+      onError: () => {
+        handleOpenSnackbar({
+          message: "Data gagal disimpan",
+        });
+        action.setSubmitting(false);
+        closeLoadingScreen();
+      },
+    });
   };
 
   return (

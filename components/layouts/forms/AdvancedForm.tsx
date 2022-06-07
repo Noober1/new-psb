@@ -7,17 +7,19 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import axios from "axios";
 import { Formik, FormikHelpers } from "formik";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
+import { useMutation } from "react-query";
 import { runDevOnly } from "../../../lib";
-import {
-  advancedSchema,
-  basicSchema,
-  numberSchema,
-} from "../../../lib/formSchema";
+import { advancedSchema } from "../../../lib/formSchema";
 import { formError } from "../../../lib/formUtils";
 import { StudentBio } from "../../../types/bio";
 import useLoadingScreen from "../../hooks/useLoadingScreen";
+import useSnackbar from "../../hooks/useSnackbar";
+import { NumberFormValues } from "./NumberForm";
 
 export interface AdvancedFormValues {
   nickname?: StudentBio["name"]["nickname"];
@@ -32,8 +34,11 @@ export interface AdvancedFormValues {
 }
 
 const AdvancedForm = ({ data: userBio }: { data: StudentBio }) => {
+  const router = useRouter();
+  const { handleOpenSnackbar } = useSnackbar();
+
   const initialValues: AdvancedFormValues = {
-    nickname: userBio?.numbers.NISN || "",
+    nickname: userBio?.name.nickname || "",
     religion: userBio?.religion || "islam",
     nationality: userBio?.nationality || "",
     childPosition: userBio?.family.childPosition || 0,
@@ -47,6 +52,29 @@ const AdvancedForm = ({ data: userBio }: { data: StudentBio }) => {
   const [loadingScreen, openLoadingScreen, closeLoadingScreen] =
     useLoadingScreen();
 
+  // updating functions
+  const { data: session } = useSession();
+  const updateBio = async (data: AdvancedFormValues) => {
+    if (!session?.accessToken) {
+      throw new Error("access token not found");
+    }
+    const url = process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio/advanced";
+    const response = await axios
+      .put(url, data, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+      .then((result) => result.data);
+
+    if (!response) {
+      throw new Error("Error updating bio");
+    }
+
+    return response;
+  };
+  const mutation = useMutation(updateBio);
+
   const submitForm = (
     values: AdvancedFormValues,
     action: FormikHelpers<AdvancedFormValues>
@@ -55,10 +83,22 @@ const AdvancedForm = ({ data: userBio }: { data: StudentBio }) => {
       console.log(values);
     });
     openLoadingScreen("Menyimpan data");
-    setTimeout(() => {
-      closeLoadingScreen();
-      action.setSubmitting(false);
-    }, 5000);
+    mutation.mutate(values, {
+      onSuccess: () => {
+        router.push("/profile");
+        handleOpenSnackbar({
+          message: "Data berhasil disimpan",
+        });
+        closeLoadingScreen();
+      },
+      onError: () => {
+        handleOpenSnackbar({
+          message: "Data gagal disimpan",
+        });
+        action.setSubmitting(false);
+        closeLoadingScreen();
+      },
+    });
   };
 
   return (
@@ -146,8 +186,8 @@ const AdvancedForm = ({ data: userBio }: { data: StudentBio }) => {
             <TextField
               className="col-span-4 sm:col-span-2"
               error={isError("siblingCount")}
-              label="Jumlah anak kandung dalam keluarga"
               name="siblingCount"
+              label="Jumlah anak kandung dalam keluarga"
               helperText={helperText("siblingCount")}
               onBlur={handleBlur}
               value={values.siblingCount}
@@ -183,7 +223,15 @@ const AdvancedForm = ({ data: userBio }: { data: StudentBio }) => {
                 onChange={handleChange}
                 required
               >
-                {["kandung", "angkat", "adopsi", "lainnya"].map((item) => (
+                {[
+                  "kandung",
+                  "angkat",
+                  "adopsi",
+                  "yatim",
+                  "piatu",
+                  "yatimpiatu",
+                  "lainnya",
+                ].map((item) => (
                   <MenuItem key={item} value={item}>
                     <span className="capitalize">{item}</span>
                   </MenuItem>

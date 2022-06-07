@@ -19,8 +19,8 @@ interface ParentType {
   fullName?: string | null;
   birthDate?: string | null;
   nationality?: string | null;
-  education?: ParentEducation | null;
-  occupation?: string | null;
+  education?: ParentEducation | null | "";
+  occupation?: string | null | "";
   income?: number | null;
   address?: string | null;
 }

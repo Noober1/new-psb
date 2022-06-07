@@ -7,14 +7,9 @@ import Hero from "../components/organisms/Hero";
 
 const Home: MainLayoutType = () => {
   return (
-    <>
-      <Head>
-        <title>Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak</title>
-      </Head>
-      <div className="grid-grid-cols-1">
-        <Hero />
-      </div>
-    </>
+    <div className="grid-grid-cols-1">
+      <Hero />
+    </div>
   );
 };
 
@@ -28,6 +23,13 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
-Home.getLayout = (page: ReactElement) => <MainLayout>{page}</MainLayout>;
+Home.getLayout = (page: ReactElement) => (
+  <>
+    <Head>
+      <title>Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak</title>
+    </Head>
+    <MainLayout>{page}</MainLayout>
+  </>
+);
 
 export default Home;

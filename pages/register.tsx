@@ -339,7 +339,7 @@ const RegisterPage: MainLayoutType = () => {
           <Formik
             children={Form}
             initialValues={registerFormInitialValues}
-            onSubmit={(values, action) => {}}
+            onSubmit={handleSubmitForm}
             validationSchema={registerSchema}
           />
         </Paper>

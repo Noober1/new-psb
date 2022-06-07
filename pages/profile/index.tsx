@@ -11,6 +11,8 @@ import {
   Skeleton,
   Button,
   IconButton,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
@@ -96,6 +98,18 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
       return new Intl.DateTimeFormat("id-ID", {
         dateStyle: "full",
       }).format(dateObj);
+    } catch (error) {
+      return "-";
+    }
+  };
+
+  const localizeCurrency = (value?: number | null) => {
+    try {
+      if (!value) return "-";
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(value);
     } catch (error) {
       return "-";
     }
@@ -200,6 +214,17 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
             Biodata siswa
           </Typography>
         )}
+        <Alert>
+          <AlertTitle>Informasi</AlertTitle>
+          <Typography>
+            Silahkan untuk melengkapi data-data yang diperlukan berdasarkan
+            kategori dibawah ini. Kategori data yang sudah disunting akan
+            ditandai dengan simbol{" "}
+            <div className="inline w-0 h-0 relative">
+              <CheckIcon className="absolute -top-0.5 left-1" />
+            </div>
+          </Typography>
+        </Alert>
         <Paper>
           {isLoading && (
             <>
@@ -306,7 +331,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                 </TabList>
               </Box>
               <Box className="p-3 px-5 flex justify-between items-center flex-col sm:flex-row">
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" className="mb-3 md:mb-0">
                   Informasi {tabName}
                 </Typography>
                 <Button
@@ -445,6 +470,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Agama"
+                        className="capitalize"
                         secondary={data?.religion || "-"}
                       />
                     </ListItem>
@@ -626,7 +652,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Penghasilan perbulan"
-                        secondary={data?.father.income || "-"}
+                        secondary={localizeCurrency(data?.father.income) || "-"}
                       />
                     </ListItem>
                     <ListItem>
@@ -677,7 +703,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Penghasilan perbulan"
-                        secondary={data?.mother.income || "-"}
+                        secondary={localizeCurrency(data?.mother.income) || "-"}
                       />
                     </ListItem>
                     <ListItem>

@@ -8,13 +8,18 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import axios from "axios";
 import { Formik, FormikHelpers } from "formik";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
+import { useMutation } from "react-query";
 import { runDevOnly } from "../../../lib";
 import { numberSchema, parentSchema } from "../../../lib/formSchema";
 import { formError } from "../../../lib/formUtils";
 import { StudentBio } from "../../../types/bio";
 import useLoadingScreen from "../../hooks/useLoadingScreen";
+import useSnackbar from "../../hooks/useSnackbar";
 
 export interface ParentFormValues {
   fatherFullname?: StudentBio["father"]["fullName"];
@@ -52,18 +57,21 @@ const parentEducation = [
 ];
 
 const ParentForm = ({ data: userBio }: { data: StudentBio }) => {
+  const router = useRouter();
+  const { handleOpenSnackbar } = useSnackbar();
+
   const initialValues: ParentFormValues = {
     fatherFullname: userBio?.father.fullName || "",
     fatherBirthDate: userBio?.father.birthDate || "",
     fatherNationality: userBio?.father.nationality || "",
-    fatherEducation: userBio?.father.education || null,
+    fatherEducation: userBio?.father.education || "",
     fatherOccupation: userBio?.father.occupation || "",
     fatherIncome: userBio?.father.income || 0,
     fatherAddress: userBio?.father.address || "",
     motherFullname: userBio?.mother.fullName || "",
     motherBirthDate: userBio?.mother.birthDate || "",
     motherNationality: userBio?.mother.nationality || "",
-    motherEducation: userBio?.mother.education || null,
+    motherEducation: userBio?.mother.education || "",
     motherOccupation: userBio?.mother.occupation || "",
     motherIncome: userBio?.mother.income || 0,
     motherAddress: userBio?.mother.address || "",
@@ -71,6 +79,29 @@ const ParentForm = ({ data: userBio }: { data: StudentBio }) => {
 
   const [loadingScreen, openLoadingScreen, closeLoadingScreen] =
     useLoadingScreen();
+
+  // updating functions
+  const { data: session } = useSession();
+  const updateBio = async (data: ParentFormValues) => {
+    if (!session?.accessToken) {
+      throw new Error("access token not found");
+    }
+    const url = process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio/parent";
+    const response = await axios
+      .put(url, data, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+      .then((result) => result.data);
+
+    if (!response) {
+      throw new Error("Error updating bio");
+    }
+
+    return response;
+  };
+  const mutation = useMutation(updateBio);
 
   const submitForm = (
     values: ParentFormValues,
@@ -80,10 +111,22 @@ const ParentForm = ({ data: userBio }: { data: StudentBio }) => {
       console.log(values);
     });
     openLoadingScreen("Menyimpan data");
-    setTimeout(() => {
-      closeLoadingScreen();
-      action.setSubmitting(false);
-    }, 5000);
+    mutation.mutate(values, {
+      onSuccess: () => {
+        router.push("/profile");
+        handleOpenSnackbar({
+          message: "Data berhasil disimpan",
+        });
+        closeLoadingScreen();
+      },
+      onError: () => {
+        handleOpenSnackbar({
+          message: "Data gagal disimpan",
+        });
+        action.setSubmitting(false);
+        closeLoadingScreen();
+      },
+    });
   };
 
   return (

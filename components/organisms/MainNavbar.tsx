@@ -124,7 +124,7 @@ const MainNavbar = () => {
   };
 
   return (
-    <AppBar position="fixed" color="primary" elevation={0}>
+    <AppBar position="fixed" color="primary" elevation={0} component="nav">
       <Container maxWidth="xl" className="px-2 md:px-5">
         <Toolbar disableGutters>
           <ClickAwayListener onClickAway={handleCloseNavbarMenu}>

@@ -4,6 +4,24 @@ import { AdvancedFormValues } from "../components/layouts/forms/AdvancedForm";
 const graduateYearMin = 1990;
 const currentYear = new Date().getFullYear();
 
+const parentEducationList = [
+  "PAUD",
+  "TK",
+  "SD",
+  "MI",
+  "SMP",
+  "MTS",
+  "SMK",
+  "SMA",
+  "MA",
+  "D1",
+  "D2",
+  "D3",
+  "S1",
+  "S2",
+  "S3",
+];
+
 // template basic schema
 const _basicSchema = {
   firstName: Yup.string()
@@ -103,6 +121,10 @@ export const addressSchema = Yup.object().shape({
   district: Yup.string().max(30, "Panjang maksimal 30 karakter"),
   city: Yup.string().max(30, "Panjang maksimal 30 karakter"),
   province: Yup.string().max(30, "Panjang maksimal 30 karakter"),
+  postalCode: Yup.number()
+    .typeError("Data harus berupa angka")
+    .min(10000, "Kode POS terdiri dari 5 digit angka")
+    .max(99999, "Kode POS terdiri dari 5 digit angka"),
 });
 
 // additional schema
@@ -136,24 +158,6 @@ export const additionalSchema = Yup.object().shape({
 //   fatherOccupation: userBio?.father.occupation || "",
 //   fatherIncome: userBio?.father.income || 0,
 //   fatherAddress: userBio?.father.address || "",
-
-const parentEducationList = [
-  "PAUD",
-  "TK",
-  "SD",
-  "MI",
-  "SMP",
-  "MTS",
-  "SMK",
-  "SMA",
-  "MA",
-  "D1",
-  "D2",
-  "D3",
-  "S1",
-  "S2",
-  "S3",
-];
 
 const _parentSchema = {
   fullname: Yup.string().max(50, "Panjang maksimal 50 karakter"),

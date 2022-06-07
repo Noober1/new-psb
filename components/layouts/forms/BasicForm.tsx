@@ -99,6 +99,9 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
         closeLoadingScreen();
       },
       onError: () => {
+        handleOpenSnackbar({
+          message: "Data gagal disimpan",
+        });
         action.setSubmitting(false);
         closeLoadingScreen();
       },
@@ -244,7 +247,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
                 onChange={handleChange}
                 required
               >
-                {Array(new Date().getFullYear() - 1990)
+                {Array(new Date().getFullYear() + 1 - 1990)
                   .fill(null)
                   .map((item, index) => (
                     <MenuItem value={1990 + index} key={index}>
