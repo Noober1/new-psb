@@ -46,7 +46,7 @@ const registerFormInitialValues: RegisterFormValues = {
   firstName: "",
   lastName: "",
   nisn: "",
-  birthDate: "",
+  birthDate: new Date().toISOString(),
   birthPlace: "",
   email: "",
   graduateYear: new Date().getFullYear(),
@@ -132,6 +132,7 @@ const Form = ({
       />
       <div className="col-span-4 sm:col-span-2">
         <DatePicker
+          value={values.birthDate}
           error={isError("birthDate")}
           helperText={helperText("birthDate")}
           label="Tanggal lahir"
@@ -181,6 +182,7 @@ const Form = ({
           error={isError("lastEducationSchool")}
           helperText={helperText("lastEducationSchool")}
           onBlur={handleBlur}
+          value={values.lastEducationSchool}
           label="Asal sekolah"
           placeholder="Silahkan pilih"
           valueSelector="kode"
@@ -220,6 +222,7 @@ const Form = ({
           error={isError("selectedMajor")}
           helperText={helperText("selectedMajor")}
           onBlur={handleBlur}
+          value={values.selectedMajor}
           label="Jurusan yang dipilih"
           placeholder="Silahkan pilih"
           valueSelector="name"

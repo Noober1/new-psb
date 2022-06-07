@@ -107,9 +107,7 @@ const ServerSideSelect = ({
     if (onChange && newValue) {
       onChange(event, newValue[valueSelector], reason, details);
 
-      if (value) {
-        setvalueFromFetch(newValue);
-      }
+      setvalueFromFetch(newValue);
     }
   };
 

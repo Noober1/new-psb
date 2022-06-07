@@ -219,10 +219,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
           <Typography>
             Silahkan untuk melengkapi data-data yang diperlukan berdasarkan
             kategori dibawah ini. Kategori data yang sudah disunting akan
-            ditandai dengan simbol{" "}
-            <div className="inline w-0 h-0 relative">
-              <CheckIcon className="absolute -top-0.5 left-1" />
-            </div>
+            ditandai dengan simbol Checklist
           </Typography>
         </Alert>
         <Paper>
