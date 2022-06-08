@@ -9,10 +9,9 @@ import LoginBox from "../organisms/LoginBox";
 export type AuthMenuType = "login" | "forgot" | "register";
 
 const AuthBoxPopup = () => {
-  const { data: session } = useSession();
+  const { status, data: session } = useSession();
   const config = useSelector(selectNoPersistConfig);
   const [, , isSmall] = mediaQuery("xs");
-  const { status } = useSession();
 
   if (status == "authenticated" || session) return null;
 

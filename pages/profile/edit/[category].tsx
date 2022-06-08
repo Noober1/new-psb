@@ -98,6 +98,7 @@ EditProfile.getLayout = (page: ReactElement) => (
       title="Edit Profile"
       description="Halaman untuk mengubah data pribadi"
       noindex
+      nofollow
     />
     <MainLayout>{page}</MainLayout>
   </>

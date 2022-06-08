@@ -8,6 +8,28 @@ type UserDataProvider = {
   children: React.ReactElement;
 };
 
+export type MainConfig = {
+  schoolInfo: {
+    name: string;
+    address: string;
+    phone: string;
+    fax: string;
+    email: string;
+    website: string;
+  };
+  apps: {
+    SAS: {
+      isActive: boolean;
+      isMaintenance: boolean;
+    };
+    PSB: {
+      isActive: boolean;
+      activeYear: number;
+      NoRegisterPattern: string;
+    };
+  };
+};
+
 const UserDataProvider = ({ children }: UserDataProvider) => {
   const { data: session, status } = useSession();
 
@@ -21,7 +43,22 @@ const UserDataProvider = ({ children }: UserDataProvider) => {
     enabled: status !== "loading" && status === "authenticated" ? true : false,
   });
 
-  const showLoadingScreen = status === "loading" || isLoading;
+  const { isLoading: mainDataLoading } = useQuery(
+    "config",
+    (data) => {
+      return axios
+        .get(process.env.NEXT_PUBLIC_API_URL + "/config", {
+          signal: data.signal,
+        })
+        .then((response) => response.data);
+    },
+    {
+      enabled: status !== "loading",
+    }
+  );
+
+  const showLoadingScreen =
+    status === "loading" || isLoading || mainDataLoading;
 
   return (
     <>

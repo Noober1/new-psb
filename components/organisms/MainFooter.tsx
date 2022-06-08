@@ -87,17 +87,11 @@ const MainFooter = () => {
                 <IconButton href="https://fb.me/binatarunasubang">
                   <FacebookIcon fontSize="large" />
                 </IconButton>
-                <IconButton>
-                  <InstagramIcon
-                    fontSize="large"
-                    href="https://www.instagram.com/smkbinatarunajalancagak"
-                  />
+                <IconButton href="https://www.instagram.com/smkbinatarunajalancagak">
+                  <InstagramIcon fontSize="large" />
                 </IconButton>
-                <IconButton>
-                  <EmailIcon
-                    fontSize="large"
-                    href="mailto:smks.binataruna.jlcgk@gmail.com"
-                  />
+                <IconButton href="mailto:smks.binataruna.jlcgk@gmail.com">
+                  <EmailIcon fontSize="large" />
                 </IconButton>
               </Box>
             </Box>

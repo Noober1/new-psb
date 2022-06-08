@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   IconButton,
@@ -24,6 +25,8 @@ import PaperWithLoadingOverlay from "../atoms/PaperWithLoadingOverlay";
 import Link from "../atoms/Link";
 import useSnackbar from "../hooks/useSnackbar";
 import { useRouter } from "next/router";
+import { useQueryClient } from "react-query";
+import { MainConfig } from "../atoms/UserDataProvider";
 
 type LoginFormValues = {
   email?: string;
@@ -36,12 +39,15 @@ export type LoginBoxProps = PaperProps & {
 };
 
 const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
+  const queryClient = useQueryClient();
+  const getMainConfig = queryClient.getQueryData<MainConfig>("config");
   const dispatch = useDispatch();
   const router = useRouter();
   const redirectTo = router.query.redirectTo as string;
   const [redirectToState, setredirectToState] = useState<boolean>(
     redirectTo ? true : false
   );
+
   useEffect(() => {
     if (redirectToState) {
       setTimeout(() => {
@@ -99,6 +105,25 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   };
   const [showPassword, setshowPassword] = useState<boolean>(false);
   const toggleShowPassword = () => setshowPassword(!showPassword);
+
+  if (getMainConfig?.apps.PSB.isActive === false) {
+    return (
+      <Paper className="p-5 relative">
+        {popupMode && (
+          <Box className="absolute top-1 right-1">
+            <ToggleLoginBoxButton buttonType="icon" closeIcon />
+          </Box>
+        )}
+        <Typography variant="h5" gutterBottom>
+          Login ditutup
+        </Typography>
+        <Typography>
+          Saat ini sistem pendaftaran siswa baru dari sedang ditutup. Silahkan
+          untuk menghubungi administrator untuk informasi lebih lanjut
+        </Typography>
+      </Paper>
+    );
+  }
 
   return (
     <Formik

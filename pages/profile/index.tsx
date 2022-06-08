@@ -728,6 +728,7 @@ ProfilePage.getLayout = (page: ReactElement) => (
       title="Profil"
       description="Halaman profil calon siswa baru"
       noindex
+      nofollow
     />
     <MainLayout>{page}</MainLayout>
   </>

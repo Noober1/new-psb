@@ -35,6 +35,8 @@ import { BasicFormValues } from "../components/layouts/forms/BasicForm";
 import { registerSchema } from "../lib/formSchema";
 import { formError } from "../lib/formUtils";
 import { NextSeo } from "next-seo";
+import { useQueryClient } from "react-query";
+import { MainConfig } from "../components/atoms/UserDataProvider";
 
 type RegisterFormValues = BasicFormValues & {
   nisn: string;
@@ -251,6 +253,8 @@ const Form = ({
 
 const RegisterPage: MainLayoutType = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const getMainData = queryClient.getQueryData<MainConfig>("config");
   const { executeRecaptcha } = useGoogleReCaptcha();
   const { handleOpenSnackbar: openSnackbar } = useSnackbar();
   const [, underSmScreen] = mediaQuery("md");
@@ -318,9 +322,25 @@ const RegisterPage: MainLayoutType = () => {
 
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
+  if (getMainData?.apps.PSB.isActive === false) {
+    return (
+      <Container maxWidth="md" className="my-6">
+        <Paper className="p-5">
+          <Typography variant="h4" gutterBottom>
+            Pendaftaran ditutup
+          </Typography>
+          <Typography>
+            Saat ini sistem pendaftaran siswa baru dari sedang ditutup. Silahkan
+            untuk menghubungi administrator untuk informasi lebih lanjut
+          </Typography>
+        </Paper>
+      </Container>
+    );
+  }
+
   return (
     <>
-      <Container className="my-24">
+      <Container className="my-6">
         <Typography
           variant="h3"
           fontWeight="bold"
