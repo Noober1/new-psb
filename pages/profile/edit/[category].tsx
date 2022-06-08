@@ -23,6 +23,7 @@ import AddressForm from "../../../components/layouts/forms/AddressForm";
 import ParentForm from "../../../components/layouts/forms/ParentForm";
 import Head from "next/head";
 import AdditionalForm from "../../../components/layouts/forms/AdditionalForm";
+import { NextSeo } from "next-seo";
 
 const categoryList = [
   "basic",
@@ -93,9 +94,11 @@ const EditProfile: MainLayoutType<ProfileEditProps> = ({
 
 EditProfile.getLayout = (page: ReactElement) => (
   <>
-    <Head>
-      <title>Edit Profile</title>
-    </Head>
+    <NextSeo
+      title="Edit Profile"
+      description="Halaman untuk mengubah data pribadi"
+      noindex
+    />
     <MainLayout>{page}</MainLayout>
   </>
 );

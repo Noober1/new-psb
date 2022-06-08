@@ -1,6 +1,7 @@
 import { Container, Paper, Typography } from "@mui/material";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getSession } from "next-auth/react";
+import { NextSeo } from "next-seo";
 import React, { ReactElement } from "react";
 import { useQuery } from "react-query";
 import MainLayout, { MainLayoutType } from "../components/layouts/Main";
@@ -40,6 +41,14 @@ const About: MainLayoutType = () => {
   );
 };
 
-About.getLayout = (page: ReactElement) => <MainLayout>{page}</MainLayout>;
+About.getLayout = (page: ReactElement) => (
+  <>
+    <NextSeo
+      title="Tentang kami"
+      description="Informasi tentang SMK Bina Taruna Jalancagak dan situs pendaftaran siswa baru"
+    />
+    <MainLayout>{page}</MainLayout>
+  </>
+);
 
 export default About;

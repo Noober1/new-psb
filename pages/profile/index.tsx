@@ -39,6 +39,7 @@ import Link from "../../components/atoms/Link";
 import mediaQuery from "../../components/hooks/mediaQuery";
 import CheckIcon from "@mui/icons-material/CheckCircleOutlined";
 import LoadingScreen from "../../components/atoms/LoadingScreen";
+import { NextSeo } from "next-seo";
 
 const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
   const { status } = useSession();
@@ -723,9 +724,11 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
 
 ProfilePage.getLayout = (page: ReactElement) => (
   <>
-    <Head>
-      <title>Profile - SMK Bina Taruna Jalancagak</title>
-    </Head>
+    <NextSeo
+      title="Profil"
+      description="Halaman profil calon siswa baru"
+      noindex
+    />
     <MainLayout>{page}</MainLayout>
   </>
 );

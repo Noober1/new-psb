@@ -23,6 +23,7 @@ import UserDataProvider from "../components/atoms/UserDataProvider";
 import NextNProgress from "nextjs-progressbar";
 import useLoadingScreen from "../components/hooks/useLoadingScreen";
 import PageLoading from "../components/organisms/PageLoading";
+import { DefaultSeo } from "next-seo";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,15 @@ const NgulixApp = ({ Component, pageProps }: AppPropsWithLayout) => {
               <ReactQueryDevtools
                 initialIsOpen={false}
                 position="bottom-left"
+              />
+              {/* Next SEO */}
+              <DefaultSeo
+                titleTemplate="%s - SMK Bina Taruna Jalancagak"
+                openGraph={{
+                  type: "website",
+                  locale: "id_ID",
+                  url: process.env.NEXT_PUBLIC_BASE_URL,
+                }}
               />
               {/* component */}
               {getLayout(<Component {...pageProps} />)}

@@ -9,6 +9,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import { NextSeo } from "next-seo";
 import Head from "next/head";
 import React, { ReactElement } from "react";
 import Link from "../components/atoms/Link";
@@ -88,13 +89,10 @@ const GuidePage: MainLayoutType = () => {
 
 GuidePage.getLayout = (page: ReactElement) => (
   <>
-    <Head>
-      <title>Panduan Pendaftaran Siswa Baru SMK Bina Taruna Jalancagak</title>
-      <meta
-        name="description"
-        content="Petunjuk dan informasi Pendaftaran Siswa Baru(PSB) di SMK Bina Taruna Jalancagak"
-      />
-    </Head>
+    <NextSeo
+      title="Panduan Pendaftaran Siswa Baru"
+      description="Petunjuk dan informasi Pendaftaran Siswa Baru(PSB) di SMK Bina Taruna Jalancagak"
+    />
     <MainLayout>{page}</MainLayout>
   </>
 );

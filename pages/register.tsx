@@ -34,6 +34,7 @@ import Head from "next/head";
 import { BasicFormValues } from "../components/layouts/forms/BasicForm";
 import { registerSchema } from "../lib/formSchema";
 import { formError } from "../lib/formUtils";
+import { NextSeo } from "next-seo";
 
 type RegisterFormValues = BasicFormValues & {
   nisn: string;
@@ -319,9 +320,6 @@ const RegisterPage: MainLayoutType = () => {
 
   return (
     <>
-      <Head>
-        <title>Pendaftaran - SMK Bina Taruna Jalancagak</title>
-      </Head>
       <Container className="my-24">
         <Typography
           variant="h3"
@@ -352,14 +350,20 @@ const RegisterPage: MainLayoutType = () => {
 };
 
 RegisterPage.getLayout = (page: ReactElement) => (
-  <MainLayout>
-    <GoogleReCaptchaProvider
-      language="id"
-      reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
-    >
-      {page}
-    </GoogleReCaptchaProvider>
-  </MainLayout>
+  <>
+    <NextSeo
+      title="Pendaftaran"
+      description="Halaman pendaftaran Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak"
+    />
+    <MainLayout>
+      <GoogleReCaptchaProvider
+        language="id"
+        reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+      >
+        {page}
+      </GoogleReCaptchaProvider>
+    </MainLayout>
+  </>
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
