@@ -18,5 +18,7 @@
     "sourceType": "module"
   },
   "plugins": ["react", "@typescript-eslint", "react-hooks", "next/typescript"],
-  "rules": {}
+  "rules": {
+    "no-unused-vars": "error"
+  }
 }
