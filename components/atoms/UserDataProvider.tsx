@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { QueryFunctionContext, useQuery } from "react-query";
 import LoadingScreen from "./LoadingScreen";
 
@@ -9,33 +9,16 @@ type UserDataProvider = {
 };
 
 export type MainConfig = {
-  schoolInfo: {
-    name: string;
-    address: string;
-    phone: string;
-    fax: string;
-    email: string;
-    website: string;
-  };
-  apps: {
-    SAS: {
-      isActive: boolean;
-      isMaintenance: boolean;
-    };
-    PSB: {
-      isActive: boolean;
-      activeYear: number;
-      NoRegisterPattern: string;
-    };
-  };
+  id: number;
+  year: number;
+  isActive: boolean;
 };
 
 const UserDataProvider = ({ children }: UserDataProvider) => {
   const { data: session, status } = useSession();
 
   const fetchUserData = ({ signal }: QueryFunctionContext) =>
-    axios.get(process.env.NEXT_PUBLIC_API_URL + "/ppdb/profile", {
-      headers: { Authorization: `Bearer ${session?.accessToken}` },
+    axios.get(process.env.NEXT_PUBLIC_API_URL + "/api/student/" + session?.id, {
       signal,
     });
 
@@ -47,7 +30,7 @@ const UserDataProvider = ({ children }: UserDataProvider) => {
     "config",
     (data) => {
       return axios
-        .get(process.env.NEXT_PUBLIC_API_URL + "/config", {
+        .get(process.env.NEXT_PUBLIC_API_URL + "/api/current-config", {
           signal: data.signal,
         })
         .then((response) => response.data);

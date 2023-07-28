@@ -18,17 +18,18 @@ const options: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         try {
+          const params = new URLSearchParams();
+          params.set("email", credentials?.username || "");
+          params.set("phone", credentials?.password || "");
           const getData: any = await fetchApi({
-            method: "POST",
-            url: "/ppdb/login",
-            data: {
-              username: credentials?.username,
-              password: credentials?.password,
-            },
+            method: "GET",
+            url: "/api/student?" + params.toString(),
           });
 
+          if (!getData) return null;
+
           return {
-            accessToken: getData.accessToken,
+            id: getData.id,
           };
         } catch (error) {
           console.log(error);
@@ -43,9 +44,8 @@ const options: NextAuthOptions = {
       return { ...token, ...user };
     },
     async session({ session, token, user }) {
-      const accessToken = token.accessToken as string;
       session.isLoggedIn = true;
-      session.accessToken = accessToken;
+      session.id = token.id as number;
       return session;
     },
   },

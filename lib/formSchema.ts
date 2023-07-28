@@ -32,17 +32,20 @@ const _basicSchema = {
     .email("Format alamat surel(email) tidak valid")
     .max(50, "Panjang maksimal 50 karakter")
     .required("Email wajib diisi"),
-  birthPlace: Yup.string()
+  birthplace: Yup.string()
     .max(15, "Panjang maksimal 15 karakter")
     .required("Tempat lahir wajib diisi"),
-  birthDate: Yup.date().required("Tanggal lahir wajib diisi"),
-  graduateYear: Yup.number()
+  birthdate: Yup.date().required("Tanggal lahir wajib diisi"),
+  schoolGraduateYear: Yup.number()
     .min(graduateYearMin)
     .max(currentYear)
     .required("Tahun lulus wajib diisi"),
-  lastEducation: Yup.string().required("Pendidikan terakhir wajib diisi"),
-  lastEducationSchool: Yup.string().required("Asal sekolah wajib diisi"),
-  selectedMajor: Yup.string().required("Jurusan yang dipilih wajib diisi"),
+  schoolId: Yup.number()
+    .min(1, "Asal sekolah wajib diisi")
+    .required("Asal sekolah wajib diisi"),
+  majorId: Yup.number()
+    .min(1, "Jurusan yang dipilih wajib diisi")
+    .required("Jurusan yang dipilih wajib diisi"),
 };
 
 // basic profile schema
@@ -51,11 +54,11 @@ export const basicSchema = Yup.object().shape(_basicSchema);
 // registration form schema
 export const registerSchema = Yup.object().shape({
   ..._basicSchema,
-  nisn: Yup.string()
+  NISNNumber: Yup.string()
     .min(8, "Panjang digit minimal 8 digit")
     .max(10, "Panjang maksimal 10 karakter")
     .required("NISN wajib diisi"),
-  phone: Yup.string()
+  phoneNumber: Yup.string()
     .matches(/^[0-9]*$/, "Nomor telpon invalid")
     .max(15, "Panjang maksimal 15 digit angka tanpa simbol ataupun huruf")
     .required("Nomor telpon wajib diisi"),

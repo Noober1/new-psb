@@ -106,7 +106,7 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const [showPassword, setshowPassword] = useState<boolean>(false);
   const toggleShowPassword = () => setshowPassword(!showPassword);
 
-  if (getMainConfig?.apps.PSB.isActive === false) {
+  if (getMainConfig?.isActive === false) {
     return (
       <Paper className="p-5 relative">
         {popupMode && (

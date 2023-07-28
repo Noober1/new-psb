@@ -108,7 +108,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
     const category = context.params?.category as string;
     const session = await getSession(context);
-    console.log(session);
     //if category is not in categoryList OR session data is not found, redirect to homepage
     if (!categoryList.includes(category) || !session) {
       return {
@@ -120,9 +119,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     const getProfile = await axios
-      .get(process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio", {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
-      })
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/student/${session.id}/bio`)
       .then((response) => response.data);
 
     return {

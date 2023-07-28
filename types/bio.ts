@@ -52,7 +52,10 @@ export interface StudentBio {
     nickname: string | null;
     initial: string;
   };
-  selectedMajor: string;
+  selectedMajor: {
+    id: number;
+    name: string;
+  };
   disease: {
     relapsingDisease: string | null;
     seriousDisease: string | null;
@@ -104,27 +107,16 @@ export interface StudentBio {
     postalCode: number | null;
   };
   body: {
-    sex: "L" | "P";
+    sex: "MALE" | "FEMALE";
     weight: number | null;
     height: number | null;
-    bloodType:
-      | "A+"
-      | "A-"
-      | "B+"
-      | "B-"
-      | "O+"
-      | "O-"
-      | "AB+"
-      | "AB-"
-      | null
-      | "";
+    bloodType: "A" | "B" | "O" | "AB" | null | "";
+    bloodRhesus: "PLUS" | "MINUS" | "UNKNOWN";
   };
   lastEducation: {
+    id: number;
     grade: "SMP" | "MTS";
-    school: {
-      code: string | null;
-      name: string | null;
-    };
+    school: string | null;
     graduateYear: number;
   };
   father: ParentType;

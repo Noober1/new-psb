@@ -25,7 +25,7 @@ type ServerSideSelectProps = {
   label?: string;
   resultDataKey?: string;
   valueSelector: string;
-  value?: string | null;
+  value?: string | number | null;
   labelSelector: string;
   placeholder?: string;
   helperText?: string;

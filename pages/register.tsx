@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Formik, FormikProps } from "formik";
+import { Formik, FormikProps, useFormik } from "formik";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -30,34 +30,41 @@ import {
 import fetchApi from "../lib/fetchApi";
 import axios from "axios";
 import useSnackbar from "../components/hooks/useSnackbar";
-import Head from "next/head";
 import { BasicFormValues } from "../components/layouts/forms/BasicForm";
 import { registerSchema } from "../lib/formSchema";
 import { formError } from "../lib/formUtils";
 import { NextSeo } from "next-seo";
 import { useQueryClient } from "react-query";
 import { MainConfig } from "../components/atoms/UserDataProvider";
+import { useMutation } from "../lib/mutation";
 
-type RegisterFormValues = BasicFormValues & {
-  nisn: string;
-  phone: string;
+interface RegisterFormValues {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   email: string;
+  birthplace: string;
+  birthdate: string;
+  gender: "MALE" | "FEMALE";
+  NISNNumber: string;
+  schoolId: number;
+  schoolGraduateYear: number;
+  majorId: number;
   captchaToken: string;
-};
+}
 
 const registerFormInitialValues: RegisterFormValues = {
   firstName: "",
   lastName: "",
-  nisn: "",
-  birthDate: new Date().toISOString(),
-  birthPlace: "",
+  NISNNumber: "",
+  birthdate: new Date().toISOString(),
+  birthplace: "",
   email: "",
-  graduateYear: new Date().getFullYear(),
-  lastEducation: "SMP",
-  lastEducationSchool: "",
-  phone: "",
-  selectedMajor: "",
-  sex: "L",
+  schoolGraduateYear: new Date().getFullYear(),
+  schoolId: 0,
+  phoneNumber: "",
+  majorId: 0,
+  gender: "MALE",
   captchaToken: "",
 };
 
@@ -65,194 +72,9 @@ const graduateYearMin = 1990;
 const currentYear = new Date().getFullYear();
 const graduateYearOptions = currentYear - graduateYearMin + 1;
 
-const Form = ({
-  values,
-  errors,
-  touched,
-  handleChange,
-  handleBlur,
-  handleSubmit,
-  setFieldValue,
-  isSubmitting,
-}: FormikProps<RegisterFormValues>) => {
-  const { isError, helperText } = formError(
-    errors,
-    touched,
-    registerFormInitialValues
-  );
-
-  return (
-    <form className="grid grid-cols-4 gap-3 gap-y-5" onSubmit={handleSubmit}>
-      <TextField
-        className="col-span-4 sm:col-span-2 capitalize"
-        error={isError("firstName")}
-        label="Nama depan"
-        name="firstName"
-        helperText={helperText("firstName")}
-        onBlur={handleBlur}
-        value={values.firstName}
-        onChange={handleChange}
-      />
-      <TextField
-        className="col-span-4 sm:col-span-2 capitalize"
-        error={isError("lastName")}
-        label="Nama belakang"
-        name="lastName"
-        helperText={helperText("lastName")}
-        onBlur={handleBlur}
-        value={values.lastName}
-        onChange={handleChange}
-      />
-      <TextField
-        className="col-span-4 sm:col-span-2 capitalize"
-        error={isError("phone")}
-        label="Nomor Telpon/Handphone"
-        name="phone"
-        helperText={helperText("phone")}
-        onBlur={handleBlur}
-        value={values.phone}
-        onChange={handleChange}
-      />
-      <TextField
-        className="col-span-4 sm:col-span-2"
-        error={isError("email")}
-        label="Alamat surel(email)"
-        name="email"
-        helperText={helperText("email")}
-        onBlur={handleBlur}
-        value={values.email}
-        onChange={handleChange}
-      />
-      <TextField
-        className="col-span-4 sm:col-span-2 capitalize"
-        error={isError("birthPlace")}
-        label="Tempat lahir"
-        name="birthPlace"
-        helperText={helperText("birthPlace")}
-        onBlur={handleBlur}
-        value={values.birthPlace}
-        onChange={handleChange}
-      />
-      <div className="col-span-4 sm:col-span-2">
-        <DatePicker
-          value={values.birthDate}
-          error={isError("birthDate")}
-          helperText={helperText("birthDate")}
-          label="Tanggal lahir"
-          onChange={(value) => setFieldValue("birthDate", value.toISOString())}
-        />
-      </div>
-      <FormControl className="col-span-4 md:col-span-2">
-        <InputLabel>Jenis kelamin</InputLabel>
-        <Select
-          label="Jenis kelamin"
-          name="sex"
-          onBlur={handleBlur}
-          value={values.sex}
-          onChange={handleChange}
-          required
-        >
-          <MenuItem value="L">Laki-laki</MenuItem>
-          <MenuItem value="P">Perempuan</MenuItem>
-        </Select>
-      </FormControl>
-      <TextField
-        className="col-span-4 md:col-span-2"
-        error={isError("nisn")}
-        label="NISN"
-        name="nisn"
-        helperText={helperText("nisn")}
-        onBlur={handleBlur}
-        value={values.nisn}
-        onChange={handleChange}
-      />
-      <FormControl className="col-span-4 lg:col-span-2">
-        <InputLabel>Pendidikan Terakhir</InputLabel>
-        <Select
-          label="Pendidikan Terakhir"
-          name="lastEducation"
-          onBlur={handleBlur}
-          value={values.lastEducation}
-          onChange={handleChange}
-          required
-        >
-          <MenuItem value="SMP">Sekolah Menengah Pertama(SMP)</MenuItem>
-          <MenuItem value="MTS">Madrasah Tsanawiyah(MTs)</MenuItem>
-        </Select>
-      </FormControl>
-      <div className="col-span-4 md:col-span-2">
-        <ServerSideSelect
-          error={isError("lastEducationSchool")}
-          helperText={helperText("lastEducationSchool")}
-          onBlur={handleBlur}
-          value={values.lastEducationSchool}
-          label="Asal sekolah"
-          placeholder="Silahkan pilih"
-          valueSelector="kode"
-          labelSelector="nama_sekolah"
-          url={process.env.NEXT_PUBLIC_API_URL + "/ppdb/sekolah"}
-          onChange={(event, value) => {
-            setFieldValue("lastEducationSchool", value);
-          }}
-        />
-      </div>
-      <FormControl className="col-span-4 md:col-span-2">
-        <InputLabel>Tahun lulus</InputLabel>
-        <Select
-          label="Tahun lulus"
-          name="graduateYear"
-          onBlur={handleBlur}
-          value={values.graduateYear}
-          MenuProps={{
-            style: {
-              maxHeight: 300,
-            },
-          }}
-          onChange={handleChange}
-          required
-        >
-          {Array(graduateYearOptions)
-            .fill(null)
-            .map((item, index) => (
-              <MenuItem value={graduateYearMin + index} key={index}>
-                {graduateYearMin + index}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
-      <div className="col-span-4 md:col-span-2">
-        <ServerSideSelect
-          error={isError("selectedMajor")}
-          helperText={helperText("selectedMajor")}
-          onBlur={handleBlur}
-          value={values.selectedMajor}
-          label="Jurusan yang dipilih"
-          placeholder="Silahkan pilih"
-          valueSelector="name"
-          labelSelector="name"
-          url={process.env.NEXT_PUBLIC_API_URL + "/ppdb/jurusan"}
-          onChange={(event, value) => {
-            setFieldValue("selectedMajor", value);
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-center col-span-4 md:col-span-2">
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          size="large"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Memproses" : "Registrasi"}
-        </Button>
-      </div>
-    </form>
-  );
-};
-
 const RegisterPage: MainLayoutType = () => {
   const router = useRouter();
+  const mutation = useMutation("/api/register");
   const queryClient = useQueryClient();
   const getMainData = queryClient.getQueryData<MainConfig>("config");
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -263,56 +85,68 @@ const RegisterPage: MainLayoutType = () => {
   const isAuthenticated = userStatus == "authenticated";
   const [, openLoadingScreen, hideLoadingScreen] = useLoadingScreen();
 
-  const handleSubmitForm = async (values: RegisterFormValues, actions: any) => {
-    try {
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    setFieldValue,
+    isSubmitting,
+  } = useFormik({
+    initialValues: registerFormInitialValues,
+    validationSchema: registerSchema,
+    onSubmit: async (values, actions) => {
       openLoadingScreen("Memproses");
       if (!executeRecaptcha) {
         throw new Error("Google reCaptcha is not ready yet");
       }
-      const token = await executeRecaptcha("register");
-      if (!token) {
-        throw new Error("Get captcha token invalid");
-      }
-      values.captchaToken = token;
-      const data: any = await fetchApi({
-        method: "POST",
-        url: "/ppdb/register",
-        data: values,
-      });
-
-      if (data.success) {
-        router.push(
-          {
-            pathname: "/login",
-            query: {
-              registerSuccess: true,
-              email: values.email,
-              phone: values.phone,
-            },
+      executeRecaptcha("register").then((token) => {
+        values.captchaToken = token;
+        mutation.mutate(values, {
+          onSuccess: () => {
+            router.push(
+              {
+                pathname: "/login",
+                query: {
+                  registerSuccess: true,
+                  email: values.email,
+                  phone: values.phoneNumber,
+                },
+              },
+              "login"
+            );
+            hideLoadingScreen();
           },
-          "login"
-        );
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        let errorResponse = err.response?.data as {
-          message: string;
-          code: string;
-        };
-        openSnackbar({
-          message: errorResponse.message || "Terjadi kesalahan",
-          severity: "error",
+          onError: (error) => {
+            if (axios.isAxiosError(error) && error.response) {
+              let errorResponse = error.response?.data as {
+                message: string;
+                code: string;
+              };
+              openSnackbar({
+                message: errorResponse.message || "Terjadi kesalahan",
+                severity: "error",
+              });
+            } else {
+              openSnackbar({
+                message: "Terjadi kesalahan",
+                severity: "error",
+              });
+              hideLoadingScreen();
+              actions.setSubmitting(false);
+            }
+          },
         });
-      } else {
-        openSnackbar({
-          message: "Terjadi kesalahan",
-          severity: "error",
-        });
-      }
-    }
-    hideLoadingScreen();
-    actions.setSubmitting(false);
-  };
+      });
+    },
+  });
+  const { isError, helperText } = formError(
+    errors,
+    touched,
+    registerFormInitialValues
+  );
 
   useEffect(() => {
     if (userStatus == "authenticated") {
@@ -322,7 +156,7 @@ const RegisterPage: MainLayoutType = () => {
 
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
-  if (getMainData?.apps.PSB.isActive === false) {
+  if (getMainData?.isActive === false) {
     return (
       <Container maxWidth="md" className="my-6">
         <Paper className="p-5">
@@ -357,12 +191,163 @@ const RegisterPage: MainLayoutType = () => {
               Login disini
             </Link>
           </Typography>
-          <Formik
-            children={Form}
-            initialValues={registerFormInitialValues}
-            onSubmit={handleSubmitForm}
-            validationSchema={registerSchema}
-          />
+          <form
+            className="grid grid-cols-4 gap-3 gap-y-5"
+            onSubmit={handleSubmit}
+          >
+            <TextField
+              className="col-span-4 sm:col-span-2 capitalize"
+              error={isError("firstName")}
+              label="Nama depan"
+              name="firstName"
+              helperText={helperText("firstName")}
+              onBlur={handleBlur}
+              value={values.firstName}
+              onChange={handleChange}
+            />
+            <TextField
+              className="col-span-4 sm:col-span-2 capitalize"
+              error={isError("lastName")}
+              label="Nama belakang"
+              name="lastName"
+              helperText={helperText("lastName")}
+              onBlur={handleBlur}
+              value={values.lastName}
+              onChange={handleChange}
+            />
+            <TextField
+              className="col-span-4 sm:col-span-2 capitalize"
+              error={isError("phoneNumber")}
+              label="Nomor Telpon/Handphone"
+              name="phoneNumber"
+              helperText={helperText("phoneNumber")}
+              onBlur={handleBlur}
+              value={values.phoneNumber}
+              onChange={handleChange}
+            />
+            <TextField
+              className="col-span-4 sm:col-span-2"
+              error={isError("email")}
+              label="Alamat surel(email)"
+              name="email"
+              helperText={helperText("email")}
+              onBlur={handleBlur}
+              value={values.email}
+              onChange={handleChange}
+            />
+            <TextField
+              className="col-span-4 sm:col-span-2 capitalize"
+              error={isError("birthplace")}
+              label="Tempat lahir"
+              name="birthplace"
+              helperText={helperText("birthplace")}
+              onBlur={handleBlur}
+              value={values.birthplace}
+              onChange={handleChange}
+            />
+            <div className="col-span-4 sm:col-span-2">
+              <DatePicker
+                value={values.birthdate}
+                error={isError("birthdate")}
+                helperText={helperText("birthdate")}
+                label="Tanggal lahir"
+                onChange={(value) =>
+                  setFieldValue("birthdate", value.toISOString())
+                }
+              />
+            </div>
+            <FormControl className="col-span-4 md:col-span-2">
+              <InputLabel>Jenis kelamin</InputLabel>
+              <Select
+                label="Jenis kelamin"
+                name="gender"
+                onBlur={handleBlur}
+                value={values.gender}
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="MALE">Laki-laki</MenuItem>
+                <MenuItem value="FEMALE">Perempuan</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              className="col-span-4 md:col-span-2"
+              error={isError("NISNNumber")}
+              label="NISN"
+              name="NISNNumber"
+              helperText={helperText("NISNNumber")}
+              onBlur={handleBlur}
+              value={values.NISNNumber}
+              onChange={handleChange}
+            />
+            <div className="col-span-4 md:col-span-2">
+              <ServerSideSelect
+                error={isError("schoolId")}
+                helperText={helperText("schoolId")}
+                onBlur={handleBlur}
+                value={values.schoolId}
+                label="Asal sekolah"
+                placeholder="Silahkan pilih"
+                valueSelector="name"
+                labelSelector="label"
+                url={process.env.NEXT_PUBLIC_API_URL + "/api/schools"}
+                onChange={(event, value) => {
+                  setFieldValue("schoolId", value);
+                }}
+              />
+            </div>
+            <FormControl className="col-span-4 md:col-span-2">
+              <InputLabel>Tahun lulus</InputLabel>
+              <Select
+                label="Tahun lulus"
+                name="schoolGraduateYear"
+                onBlur={handleBlur}
+                value={values.schoolGraduateYear}
+                MenuProps={{
+                  style: {
+                    maxHeight: 300,
+                  },
+                }}
+                onChange={handleChange}
+                required
+              >
+                {Array(graduateYearOptions)
+                  .fill(null)
+                  .map((item, index) => (
+                    <MenuItem value={graduateYearMin + index} key={index}>
+                      {graduateYearMin + index}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+            <div className="col-span-4 md:col-span-2">
+              <ServerSideSelect
+                error={isError("majorId")}
+                helperText={helperText("majorId")}
+                onBlur={handleBlur}
+                value={values.majorId}
+                label="Jurusan yang dipilih"
+                placeholder="Silahkan pilih"
+                valueSelector="name"
+                labelSelector="label"
+                url={process.env.NEXT_PUBLIC_API_URL + "/api/major"}
+                onChange={(event, value) => {
+                  setFieldValue("majorId", value);
+                }}
+              />
+            </div>
+            <div className="flex items-center justify-center col-span-4 md:col-span-2">
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Memproses" : "Registrasi"}
+              </Button>
+            </div>
+          </form>
         </Paper>
       </Container>
     </>

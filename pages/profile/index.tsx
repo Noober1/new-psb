@@ -40,6 +40,7 @@ import mediaQuery from "../../components/hooks/mediaQuery";
 import CheckIcon from "@mui/icons-material/CheckCircleOutlined";
 import LoadingScreen from "../../components/atoms/LoadingScreen";
 import { NextSeo } from "next-seo";
+import { localizeDate } from "../../lib/utils";
 
 const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
   const { status } = useSession();
@@ -65,7 +66,6 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
     { label: "Dasar", name: "basic" },
     { label: "Nomor", name: "number" },
     { label: "Lanjutan", name: "advanced" },
-    { label: "Alamat", name: "address" },
     { label: "Tambahan", name: "additional" },
     { label: "Orang tua", name: "parent" },
   ];
@@ -79,8 +79,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
 
   const fetchBio = ({ signal }: QueryFunctionContext) =>
     axios
-      .get(process.env.NEXT_PUBLIC_API_URL + "/ppdb/bio", {
-        headers: { Authorization: `Bearer ${session?.accessToken}` },
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/student/${session.id}/bio`, {
         signal,
       })
       .then((response) => response.data);
@@ -91,18 +90,6 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
     isError,
   } = useQuery<AxiosResponse<StudentBio, any>["data"]>("user-bio", fetchBio);
   const isLoading = fetchLoading && !isError;
-
-  const localizeDate = (date?: string) => {
-    try {
-      if (!date) return "-";
-      const dateObj = new Date(date);
-      return new Intl.DateTimeFormat("id-ID", {
-        dateStyle: "full",
-      }).format(dateObj);
-    } catch (error) {
-      return "-";
-    }
-  };
 
   const localizeCurrency = (value?: number | null) => {
     try {
@@ -131,7 +118,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
           </Box>
           <Box className="flex gap-2 justify-center">
             <Button variant="contained">
-              {downMd ? "Cetak" : "Cetak info pendaftaran"}
+              {downMd ? "Unduh" : "Unduh info pendaftaran"}
             </Button>
           </Box>
         </Paper>
@@ -156,7 +143,12 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
               {isLoading ? (
                 <Skeleton height={40} width="75%" />
               ) : (
-                <Typography variant="h4" fontWeight="bold" noWrap>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  noWrap
+                  textTransform="capitalize"
+                >
                   {data?.name.fullName}
                 </Typography>
               )}
@@ -185,7 +177,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                       <Typography color="primary" className="hidden md:inline">
                         Jurusan:{" "}
                       </Typography>
-                      {data?.selectedMajor}
+                      {data?.selectedMajor.name}
                     </Typography>
                   </>
                 )}
@@ -200,7 +192,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                       <Typography color="primary" className="hidden md:inline">
                         Tgl. Pendaftaran:{" "}
                       </Typography>
-                      {localizeDate(data?.registerDate)}
+                      {localizeDate(data?.registerDate || "")}
                     </Typography>
                   </>
                 )}
@@ -301,14 +293,6 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     }
                   />
                   <Tab
-                    label="Alamat"
-                    value="address"
-                    iconPosition="start"
-                    icon={
-                      data?.bioEditProgress.address ? <CheckIcon /> : undefined
-                    }
-                  />
-                  <Tab
                     label="Tambahan"
                     value="additional"
                     iconPosition="start"
@@ -348,12 +332,14 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Nama depan"
+                        className="capitalize"
                         secondary={data?.name.firstName}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Nama belakang"
+                        className="capitalize"
                         secondary={data?.name.lastName || "-"}
                       />
                     </ListItem>
@@ -372,16 +358,16 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Tanggal lahir"
-                        secondary={localizeDate(data?.birth.date)}
+                        secondary={localizeDate(data?.birth.date || "")}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Jenis kelamin"
                         secondary={
-                          data?.body.sex == "L"
+                          data?.body.sex == "MALE"
                             ? "Laki-laki"
-                            : data?.body.sex == "P"
+                            : data?.body.sex == "FEMALE"
                             ? "Perempuan"
                             : "-"
                         }
@@ -396,7 +382,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Asal sekolah"
-                        secondary={data?.lastEducation.school.name}
+                        secondary={data?.lastEducation.school}
                       />
                     </ListItem>
                     <ListItem>
@@ -408,7 +394,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Jurusan yang dipilih"
-                        secondary={data?.selectedMajor}
+                        secondary={data?.selectedMajor.name}
                       />
                     </ListItem>
                   </List>
@@ -462,6 +448,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Nama panggilan"
+                        className="capitalize"
                         secondary={data?.name.nickname || "-"}
                       />
                     </ListItem>
@@ -469,7 +456,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                       <ListItemText
                         primary="Agama"
                         className="capitalize"
-                        secondary={data?.religion || "-"}
+                        secondary={data?.religion.toLowerCase() || "-"}
                       />
                     </ListItem>
                     <ListItem>
@@ -507,55 +494,16 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Status di keluarga"
-                        secondary={data?.family.familyStatus || "-"}
+                        className="capitalize"
+                        secondary={
+                          data?.family.familyStatus.toLowerCase() || "-"
+                        }
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Bahasa yang digunakan dirumah"
                         secondary={data?.motherLanguage || "-"}
-                      />
-                    </ListItem>
-                  </List>
-                </Box>
-              </TabPanel>
-              <TabPanel className="p-0" value="address">
-                <Box className="p-2" data-section="box-section">
-                  <List className="grid grid-cols-1 md:grid-cols-2">
-                    <ListItem>
-                      <ListItemText
-                        primary="Jalan/kampung/dusun"
-                        secondary={data?.address.street || "-"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Provinsi"
-                        secondary={data?.address.province.name || "-"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Kabupaten"
-                        secondary={data?.address.city.name || "-"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Desa/kecamatan"
-                        secondary={data?.address.district.name || "-"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Kampung/desa"
-                        secondary={data?.address.village.name || "-"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Kode POS"
-                        secondary={data?.address.postalCode || "-"}
                       />
                     </ListItem>
                   </List>
@@ -596,6 +544,16 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     </ListItem>
                     <ListItem>
                       <ListItemText
+                        primary="Rhesus darah"
+                        secondary={
+                          data?.body.bloodRhesus == "UNKNOWN"
+                            ? "Tidak diketahui"
+                            : data?.body.bloodRhesus ?? "-"
+                        }
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
                         primary="Penyakit berat yang pernah diderita"
                         secondary={data?.disease.seriousDisease || "-"}
                       />
@@ -625,8 +583,8 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     </ListItem>
                     <ListItem>
                       <ListItemText
-                        primary="Tempat, tanggal lahir"
-                        secondary={data?.father.birthDate || "-"}
+                        primary="Tanggal lahir"
+                        secondary={localizeDate(data?.father.birthDate || "-")}
                       />
                     </ListItem>
                     <ListItem>
@@ -676,8 +634,8 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     </ListItem>
                     <ListItem>
                       <ListItemText
-                        primary="Tempat, tanggal lahir"
-                        secondary={data?.mother.birthDate || "-"}
+                        primary="Tanggal lahir"
+                        secondary={localizeDate(data?.mother.birthDate || "-")}
                       />
                     </ListItem>
                     <ListItem>
