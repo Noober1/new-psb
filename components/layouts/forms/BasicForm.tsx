@@ -7,12 +7,10 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import axios from "axios";
-import { Formik, FormikHelpers, useFormik } from "formik";
+import { useFormik } from "formik";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React from "react";
-import { useQueryClient } from "react-query";
 import { runDevOnly } from "../../../lib";
 import { basicSchema } from "../../../lib/formSchema";
 import { formError } from "../../../lib/formUtils";
@@ -58,7 +56,7 @@ const BasicForm = ({ data: userBio }: { data: StudentBio }) => {
   // updating functions
   const { data: session } = useSession();
 
-  const mutation = useMutation("/api/student/" + session?.id, "edit", [
+  const mutation = useMutation(`/api/student/${session?.id}/basic`, "edit", [
     "user-bio",
     "user-data",
   ]);

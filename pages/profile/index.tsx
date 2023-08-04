@@ -34,7 +34,6 @@ import axios, { AxiosResponse } from "axios";
 import { StudentBio } from "../../types/bio";
 import { Session } from "next-auth";
 import { useRouter } from "next/router";
-import Head from "next/head";
 import Link from "../../components/atoms/Link";
 import mediaQuery from "../../components/hooks/mediaQuery";
 import CheckIcon from "@mui/icons-material/CheckCircleOutlined";
@@ -77,18 +76,19 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
     setTabValue(newValue);
   };
 
-  const fetchBio = ({ signal }: QueryFunctionContext) =>
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/student/${session.id}/bio`, {
-        signal,
-      })
-      .then((response) => response.data);
+  type UserBioResponseData = AxiosResponse<StudentBio, any>["data"];
 
   const {
     isLoading: fetchLoading,
     data,
     isError,
-  } = useQuery<AxiosResponse<StudentBio, any>["data"]>("user-bio", fetchBio);
+  } = useQuery<UserBioResponseData>("user-bio", ({ signal }) =>
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/student/${session.id}/bio`, {
+        signal,
+      })
+      .then((response) => response.data)
+  );
   const isLoading = fetchLoading && !isError;
 
   const localizeCurrency = (value?: number | null) => {
@@ -115,11 +115,6 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                 No. Pendaftaran: <strong>{data?.registerNumber}</strong>
               </Typography>
             )}
-          </Box>
-          <Box className="flex gap-2 justify-center">
-            <Button variant="contained">
-              {downMd ? "Unduh" : "Unduh info pendaftaran"}
-            </Button>
           </Box>
         </Paper>
         <Paper className="mb-5">
@@ -210,9 +205,10 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
         <Alert>
           <AlertTitle>Informasi</AlertTitle>
           <Typography>
-            Silahkan untuk melengkapi data-data yang diperlukan berdasarkan
-            kategori dibawah ini. Kategori data yang sudah disunting akan
-            ditandai dengan simbol Checklist
+            Anda sudah terdaftar sebagai Calon Peserta Didik Baru di SMK Bina
+            Taruna Jalancagak. Silahkan untuk melengkapi data-data yang
+            diperlukan berdasarkan kategori dibawah ini. Kategori data yang
+            sudah disunting akan ditandai dengan simbol Checklist.
           </Typography>
         </Alert>
         <Paper>
@@ -533,7 +529,7 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Jarak dari tempat tinggal ke sekolah"
-                        secondary={`${data?.homeToSchoolDistance || "-"} KM`}
+                        secondary={`${data?.schoolDistance || "-"} KM`}
                       />
                     </ListItem>
                     <ListItem>
@@ -596,13 +592,13 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Pendidikan terakhir"
-                        secondary={data?.father.education || "-"}
+                        secondary={data?.father.lastEducation || "-"}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Pekerjaan"
-                        secondary={data?.father.occupation || "-"}
+                        secondary={data?.father.job || "-"}
                       />
                     </ListItem>
                     <ListItem>
@@ -647,13 +643,13 @@ const ProfilePage: MainLayoutType<{ session: Session }> = ({ session }) => {
                     <ListItem>
                       <ListItemText
                         primary="Pendidikan terakhir"
-                        secondary={data?.mother.education || "-"}
+                        secondary={data?.mother.lastEducation || "-"}
                       />
                     </ListItem>
                     <ListItem>
                       <ListItemText
                         primary="Pekerjaan"
-                        secondary={data?.mother.occupation || "-"}
+                        secondary={data?.mother.job || "-"}
                       />
                     </ListItem>
                     <ListItem>

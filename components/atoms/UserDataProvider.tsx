@@ -12,6 +12,10 @@ export type MainConfig = {
   id: number;
   year: number;
   isActive: boolean;
+  date: {
+    open: string;
+    close: string;
+  };
 };
 
 const UserDataProvider = ({ children }: UserDataProvider) => {

@@ -4,7 +4,6 @@ import {
   Toolbar,
   Typography,
   IconButton,
-  Avatar,
   MenuItem,
   ListItemIcon,
   ListItemText,
@@ -12,7 +11,6 @@ import {
   MenuList,
   Paper,
   ClickAwayListener,
-  Collapse,
 } from "@mui/material";
 import { useState, MouseEvent, useRef } from "react";
 import Logo from "../atoms/Logo";
@@ -34,7 +32,6 @@ import useUserData from "../hooks/useUserData";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../../lib/redux/slices/noPersistConfig";
 import { runDevOnly } from "../../lib";
-import mediaQuery from "../hooks/mediaQuery";
 import ProfileIcon from "../atoms/ProfileIcon";
 import { useQueryClient } from "react-query";
 
@@ -46,6 +43,7 @@ interface NavbarMenuList {
 const navbarMenuList: NavbarMenuList[] = [
   { link: "/", text: "Home" },
   { link: "/guide", text: "Panduan" },
+  { link: "/announcement", text: "Pengumuman" },
   { link: "/about", text: "Tentang" },
 ];
 
@@ -126,7 +124,7 @@ const MainNavbar = () => {
   return (
     <AppBar position="fixed" color="primary" elevation={0} component="nav">
       <Container maxWidth="xl" className="px-2 md:px-5">
-        <Toolbar disableGutters>
+        <Toolbar disableGutters variant="dense">
           <ClickAwayListener onClickAway={handleCloseNavbarMenu}>
             <div className="md:hidden">
               <IconButton

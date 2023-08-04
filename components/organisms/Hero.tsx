@@ -83,6 +83,13 @@ const Hero: FunctionComponent = () => {
             <Button LinkComponent={Link} href="/guide" variant="contained">
               Panduan
             </Button>
+            <Button
+              LinkComponent={Link}
+              href="/announcement"
+              variant="contained"
+            >
+              Pengumuman
+            </Button>
             {!isAuthenticated ? (
               <>
                 <Button

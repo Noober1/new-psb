@@ -41,6 +41,18 @@ export type LoginBoxProps = PaperProps & {
 const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const queryClient = useQueryClient();
   const getMainConfig = queryClient.getQueryData<MainConfig>("config");
+  const dateOpen =
+    typeof getMainConfig?.date.open == "string"
+      ? new Date(getMainConfig?.date.open)
+      : new Date();
+  const dateClose =
+    typeof getMainConfig?.date.close == "string"
+      ? new Date(getMainConfig?.date.close)
+      : new Date();
+  const currentDate = new Date();
+  const isNotOpenYet = currentDate.getTime() < dateOpen.getTime();
+  const isClosed = currentDate.getTime() > dateClose.getTime();
+
   const dispatch = useDispatch();
   const router = useRouter();
   const redirectTo = router.query.redirectTo as string;
@@ -79,12 +91,11 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
 
     runDevOnly(() => {
       console.log(result);
-    });
+    }, "Sign in result");
 
     if (result.ok) {
       actions.setSubmitting(false);
       dispatch(closeLoginPopup());
-      // TODO: mutate user data
       openSnackbar({
         positionX: "center",
         message: "Berhasil login",
@@ -106,7 +117,7 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
   const [showPassword, setshowPassword] = useState<boolean>(false);
   const toggleShowPassword = () => setshowPassword(!showPassword);
 
-  if (getMainConfig?.isActive === false) {
+  if (!getMainConfig?.isActive || isNotOpenYet || isClosed) {
     return (
       <Paper className="p-5 relative">
         {popupMode && (
@@ -118,8 +129,25 @@ const LoginBox = ({ showCloseButton, popupMode }: LoginBoxProps) => {
           Login ditutup
         </Typography>
         <Typography>
-          Saat ini sistem pendaftaran siswa baru dari sedang ditutup. Silahkan
-          untuk menghubungi administrator untuk informasi lebih lanjut
+          {!getMainConfig?.isActive && (
+            <>
+              Saat ini sistem pendaftaran siswa baru dari sedang ditutup.
+              Silahkan untuk menghubungi administrator untuk informasi lebih
+              lanjut
+            </>
+          )}
+          {isNotOpenYet && (
+            <>
+              Saat ini pendaftaran belum dibuka. Pendaftaran akan dibuka pada
+              tanggal{" "}
+              {dateOpen.toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </>
+          )}
+          {isClosed && <>Pendaftaran telah ditutup. Anda tidak dapat login.</>}
         </Typography>
       </Paper>
     );

@@ -37,6 +37,7 @@ import { NextSeo } from "next-seo";
 import { useQueryClient } from "react-query";
 import { MainConfig } from "../components/atoms/UserDataProvider";
 import { useMutation } from "../lib/mutation";
+import NextLink from "../components/atoms/Link";
 
 interface RegisterFormValues {
   firstName: string;
@@ -77,6 +78,17 @@ const RegisterPage: MainLayoutType = () => {
   const mutation = useMutation("/api/register");
   const queryClient = useQueryClient();
   const getMainData = queryClient.getQueryData<MainConfig>("config");
+  const dateOpen =
+    typeof getMainData?.date.open == "string"
+      ? new Date(getMainData?.date.open)
+      : new Date();
+  const dateClose =
+    typeof getMainData?.date.close == "string"
+      ? new Date(getMainData?.date.close)
+      : new Date();
+  const currentDate = new Date();
+  const isNotOpenYet = currentDate.getTime() < dateOpen.getTime();
+  const isClosed = currentDate.getTime() > dateClose.getTime();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const { handleOpenSnackbar: openSnackbar } = useSnackbar();
   const [, underSmScreen] = mediaQuery("md");
@@ -156,7 +168,7 @@ const RegisterPage: MainLayoutType = () => {
 
   if (isAuthenticated) return <LoadingScreen position="fixed" />;
 
-  if (getMainData?.isActive === false) {
+  if (!getMainData?.isActive || isNotOpenYet || isClosed) {
     return (
       <Container maxWidth="md" className="my-6">
         <Paper className="p-5">
@@ -164,8 +176,31 @@ const RegisterPage: MainLayoutType = () => {
             Pendaftaran ditutup
           </Typography>
           <Typography>
-            Saat ini sistem pendaftaran siswa baru dari sedang ditutup. Silahkan
-            untuk menghubungi administrator untuk informasi lebih lanjut
+            {!getMainData?.isActive && (
+              <>
+                Saat ini sistem pendaftaran siswa baru dari sedang ditutup.
+                Silahkan untuk menghubungi administrator untuk informasi lebih
+                lanjut
+              </>
+            )}
+            {isNotOpenYet && (
+              <>
+                Saat ini pendaftaran belum dibuka. Pendaftaran akan dibuka pada
+                tanggal{" "}
+                {dateOpen.toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </>
+            )}
+            {isClosed && (
+              <>
+                Pendaftaran telah ditutup. Silahkan kunjungi halaman{" "}
+                <NextLink href="/announcement">Pengumuman</NextLink> untuk
+                informasi lebih lanjut.
+              </>
+            )}
           </Typography>
         </Paper>
       </Container>
@@ -173,7 +208,10 @@ const RegisterPage: MainLayoutType = () => {
   }
 
   return (
-    <>
+    <GoogleReCaptchaProvider
+      language="id"
+      reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
+    >
       <Container className="my-6">
         <Typography
           variant="h3"
@@ -350,7 +388,7 @@ const RegisterPage: MainLayoutType = () => {
           </form>
         </Paper>
       </Container>
-    </>
+    </GoogleReCaptchaProvider>
   );
 };
 
@@ -360,14 +398,7 @@ RegisterPage.getLayout = (page: ReactElement) => (
       title="Pendaftaran"
       description="Halaman pendaftaran Pendaftaran Siswa Baru(PSB) SMK Bina Taruna Jalancagak"
     />
-    <MainLayout>
-      <GoogleReCaptchaProvider
-        language="id"
-        reCaptchaKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}
-      >
-        {page}
-      </GoogleReCaptchaProvider>
-    </MainLayout>
+    <MainLayout>{page}</MainLayout>
   </>
 );
 

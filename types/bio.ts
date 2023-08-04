@@ -19,8 +19,8 @@ interface ParentType {
   fullName?: string | null;
   birthDate?: string | null;
   nationality?: string | null;
-  education?: ParentEducation | null | "";
-  occupation?: string | null | "";
+  lastEducation?: ParentEducation | null | "";
+  job?: string | null | "";
   income?: number | null;
   address?: string | null;
 }
@@ -73,13 +73,13 @@ export interface StudentBio {
     date: string;
   };
   religion:
-    | "islam"
-    | "kristen"
-    | "katolik"
-    | "hindu"
-    | "budha"
-    | "konghucu"
-    | "lainnya";
+    | "ISLAM"
+    | "KRISTEN"
+    | "HINDU"
+    | "BUDHA"
+    | "KATHOLIK"
+    | "KONGHUCHU"
+    | "LAINNYA";
   nationality: string;
   family: {
     childPosition: number | null;
@@ -87,17 +87,17 @@ export interface StudentBio {
     stepSiblingCount: number | null;
     adoptedSiblingCount: number | null;
     familyStatus:
-      | "kandung"
-      | "angkat"
-      | "adopsi"
-      | "lainnya"
-      | "yatim"
-      | "piatu"
-      | "yatim piatu";
+      | "ADOPSI"
+      | "ANGKAT"
+      | "KANDUNG"
+      | "PIATU"
+      | "YATIM"
+      | "YATIM_PIATU"
+      | "LAINNYA";
   };
   motherLanguage: string | null;
   livingWith: string | null;
-  homeToSchoolDistance: number | null;
+  schoolDistance: number | null;
   address: {
     street: string | null;
     village: Address;
