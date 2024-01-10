@@ -150,9 +150,9 @@ const RegisterForm = () => {
                 message: "Terjadi kesalahan",
                 severity: "error",
               });
-              hideLoadingScreen();
-              actions.setSubmitting(false);
             }
+            hideLoadingScreen();
+            actions.setSubmitting(false);
           },
         });
       });
